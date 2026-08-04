@@ -1,39 +1,42 @@
 <template>
-  <a-list class="topic-list" :data-source="topics" item-layout="horizontal">
+  <a-list class="classic-topic-list" :data-source="topics">
     <template #renderItem="{ item }">
       <a-list-item
-        class="topic-row"
+        class="classic-topic-row"
         role="link"
         tabindex="0"
         @click="openTopic(item)"
-        @keydown.enter="openTopic(item)"
+        @keydown.enter.self="openTopic(item)"
       >
-        <a-list-item-meta>
-          <template #avatar>
-            <UserAvatar :avatar="item._u_avatar" :uid="item.uid" :size="46" />
-          </template>
-          <template #title>
-            <div class="topic-title-line">
-              <a-tag v-if="Number(item.essence) === 1" color="red">精华</a-tag>
-              <span class="topic-title">{{ item.title || '无标题帖子' }}</span>
-            </div>
-          </template>
-          <template #description>
-            <div class="topic-meta">
-              <button class="author-link" type="button" @click.stop="openUser(item)">
-                {{ item.uinfo?.name || item._u_name || `UID ${item.uid || '--'}` }}
-              </button>
-              <a-tag v-if="item.forum_name" class="forum-tag" color="cyan">{{ item.forum_name }}</a-tag>
-              <span><ClockCircleOutlined /> {{ formatTime(item.ctime) }}</span>
-            </div>
-          </template>
-        </a-list-item-meta>
-
-        <div class="topic-counts" aria-label="帖子统计">
-          <span><EyeOutlined /> {{ item.read_count ?? 0 }}</span>
-          <span><MessageOutlined /> {{ item.reply_count ?? 0 }}</span>
+        <div class="classic-author" @click.stop>
+          <UserAvatar :avatar="item._u_avatar" :uid="item.uid" :size="36" />
+          <button type="button" @click="openUser(item)">
+            {{ authorName(item) }}
+          </button>
         </div>
-        <RightOutlined class="row-arrow" />
+
+        <div class="classic-topic-main">
+          <div class="classic-title-line">
+            <a-tag v-if="Number(item.essence) === 1" color="red">精华</a-tag>
+            <span class="classic-title">{{ item.title || item.topic?.title || '无标题帖子' }}</span>
+          </div>
+          <div class="classic-meta">
+            <span class="mobile-author">{{ authorName(item) }} · </span>
+            <span>{{ item.read_count ?? item.topic?.read_count ?? 0 }} 点击</span>
+            <span>/</span>
+            <span>{{ formatTime(item.topic?.ctime || item.ctime) }}发布</span>
+            <a-tag v-if="item.forum_name || item.topic?.forum_name" class="mobile-forum-tag" color="cyan">
+              {{ item.forum_name || item.topic?.forum_name }}
+            </a-tag>
+          </div>
+        </div>
+
+        <div class="classic-replies" aria-label="回复数">
+          <strong>{{ item.reply_count ?? item.topic?.reply_count ?? 0 }}</strong>
+          <span>回复</span>
+        </div>
+
+        <span class="classic-forum">{{ item.forum_name || item.topic?.forum_name || '综合讨论' }}</span>
       </a-list-item>
     </template>
   </a-list>
@@ -41,12 +44,6 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
-import {
-  ClockCircleOutlined,
-  EyeOutlined,
-  MessageOutlined,
-  RightOutlined,
-} from '@ant-design/icons-vue'
 import UserAvatar from './UserAvatar.vue'
 import { formatTime } from '../utils/date'
 
@@ -60,12 +57,189 @@ function topicId(item) {
   return item.topic_id || item.id
 }
 
+function authorName(item) {
+  return item.uinfo?.name || item._u_name || `UID ${item.uid || '--'}`
+}
+
 function openTopic(item) {
   const id = topicId(item)
-  if (id) router.push({ name: 'topic', params: { id } })
+  if (!id) return
+  const floor = item.floor ?? item.floor_num
+  router.push({
+    name: 'topic',
+    params: { id },
+    hash: floor !== undefined ? `#floor-${floor}` : '',
+  })
 }
 
 function openUser(item) {
   if (item.uid) router.push({ name: 'user', params: { uid: item.uid } })
 }
 </script>
+
+<style scoped>
+.classic-topic-list :deep(.ant-list-items) {
+  overflow: hidden;
+}
+
+.classic-topic-row {
+  display: grid !important;
+  grid-template-columns: 150px minmax(0, 1fr) 72px 120px;
+  min-height: 64px;
+  padding: 7px 18px !important;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  gap: 0 16px;
+}
+
+.classic-topic-row:hover,
+.classic-topic-row:focus-visible {
+  background: #f6fbfa;
+  outline: none;
+}
+
+.classic-author {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 9px;
+}
+
+.classic-author button {
+  overflow: hidden;
+  min-width: 0;
+  padding: 0;
+  color: #677572;
+  border: 0;
+  background: transparent;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.classic-author button:hover,
+.classic-author button:focus-visible {
+  color: var(--brand);
+  text-decoration: underline;
+  outline: none;
+}
+
+.classic-topic-main {
+  align-self: center;
+  min-width: 0;
+}
+
+.classic-title-line {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+}
+
+.classic-title-line :deep(.ant-tag) {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.classic-title {
+  overflow: hidden;
+  color: #237f9f;
+  font-size: 15px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.classic-meta {
+  display: flex;
+  align-items: center;
+  margin-top: 3px;
+  color: #929c9a;
+  font-size: 11px;
+  gap: 4px;
+}
+
+.mobile-author,
+.mobile-forum-tag {
+  display: none;
+}
+
+.classic-replies {
+  display: flex;
+  align-self: center;
+  flex-direction: column;
+  color: #8d9896;
+  text-align: center;
+}
+
+.classic-replies strong {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.classic-replies span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.classic-forum {
+  overflow: hidden;
+  align-self: center;
+  color: #7c8785;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .classic-topic-row {
+    grid-template-columns: 42px minmax(0, 1fr) 46px;
+    min-height: 66px;
+    padding: 8px 12px !important;
+    gap: 0 9px;
+  }
+
+  .classic-author button,
+  .classic-forum {
+    display: none;
+  }
+
+  .mobile-author {
+    display: inline;
+  }
+
+  .mobile-forum-tag {
+    display: inline-flex;
+    margin: 0 0 0 4px;
+    line-height: 18px;
+  }
+
+  .classic-title {
+    font-size: 14px;
+  }
+
+  .classic-replies strong {
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 460px) {
+  .classic-topic-row {
+    grid-template-columns: 38px minmax(0, 1fr);
+  }
+
+  .classic-replies {
+    display: none;
+  }
+
+  .classic-meta {
+    overflow: hidden;
+    white-space: nowrap;
+  }
+}
+</style>

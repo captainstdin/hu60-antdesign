@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { authDialog } from '../stores/authDialog'
 import { session } from '../stores/session'
 
 const routes = [
@@ -34,10 +35,43 @@ const routes = [
     meta: { title: '聊天室', nav: 'chat', requiresAuth: true },
   },
   {
+    path: '/chat/:room',
+    name: 'chat-room',
+    component: () => import('../pages/ChatRoomPage.vue'),
+    props: true,
+    meta: { title: '聊天室', nav: 'chat', requiresAuth: true },
+  },
+  {
     path: '/messages',
     name: 'messages',
     component: () => import('../pages/MessagesPage.vue'),
     meta: { title: '内信', nav: 'messages', requiresAuth: true },
+  },
+  {
+    path: '/messages/chat/:uid',
+    name: 'message-chat',
+    component: () => import('../pages/MessageChatPage.vue'),
+    props: true,
+    meta: { title: '内信会话', nav: 'messages', requiresAuth: true },
+  },
+  {
+    path: '/favorites',
+    name: 'favorites',
+    component: () => import('../pages/FavoritesPage.vue'),
+    meta: { title: '我的收藏', nav: 'favorites', requiresAuth: true },
+  },
+  {
+    path: '/relationships/:type?',
+    name: 'relationships',
+    component: () => import('../pages/RelationshipsPage.vue'),
+    props: true,
+    meta: { title: '关系管理', nav: 'profile', requiresAuth: true },
+  },
+  {
+    path: '/reviews',
+    name: 'reviews',
+    component: () => import('../pages/ReviewPage.vue'),
+    meta: { title: '内容审核', nav: 'reviews', requiresAuth: true },
   },
   {
     path: '/me',
@@ -55,7 +89,12 @@ const routes = [
   {
     path: '/login',
     name: 'login',
-    component: () => import('../pages/LoginPage.vue'),
+    component: () => import('../pages/HomePage.vue'),
+    beforeEnter(to) {
+      if (session.isLoggedIn.value) return { name: 'home' }
+      authDialog.show(to.query.redirect)
+      return { name: 'home' }
+    },
     meta: { title: '登录' },
   },
   {
@@ -79,10 +118,8 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   if (!to.meta.requiresAuth || session.isLoggedIn.value) return true
-  return {
-    name: 'login',
-    query: { redirect: to.fullPath },
-  }
+  authDialog.show(to.fullPath)
+  return false
 })
 
 router.afterEach((to) => {

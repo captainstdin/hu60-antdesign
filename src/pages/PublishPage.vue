@@ -48,10 +48,12 @@
           name="content"
           :rules="[{ required: true, message: '请输入帖子正文' }]"
         >
-          <a-textarea
-            v-model:value="form.content"
-            :auto-size="{ minRows: 12, maxRows: 24 }"
-            placeholder="写点什么吧……基础版支持纯文本和服务器可识别的 UBB 内容。"
+          <ContentEditor
+            v-model="form.content"
+            :disabled="submitting"
+            :min-rows="12"
+            :max-rows="26"
+            placeholder="写下帖子正文……"
           />
         </a-form-item>
 
@@ -59,7 +61,7 @@
           class="publish-tip"
           type="info"
           show-icon
-          message="帖子在审核通过前，可能只有你自己可以看到。图片、附件和表情编辑将在下一阶段补充。"
+          message="帖子提交后可能需要等待审核。"
         />
 
         <a-alert v-if="submitError" class="publish-error" type="error" show-icon :message="submitError" />
@@ -81,8 +83,10 @@ import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Modal, message } from 'ant-design-vue'
 import { SendOutlined } from '@ant-design/icons-vue'
+import ContentEditor from '../components/ContentEditor.vue'
 import PageState from '../components/PageState.vue'
 import { forumApi } from '../services/forum'
+import { mapForumTree } from '../utils/forums'
 
 const router = useRouter()
 const formRef = ref()
@@ -93,26 +97,12 @@ const loadError = ref('')
 const submitError = ref('')
 const submitting = ref(false)
 
-function mapForums(items = [], parents = []) {
-  return items.map((item) => {
-    const path = [...parents, item.name].filter(Boolean)
-    const disabled = Number(item.notopic) === 1
-    return {
-      value: String(item.id),
-      label: path.join(' / '),
-      title: item.name,
-      selectable: !disabled,
-      children: mapForums(item.child || [], path),
-    }
-  })
-}
-
 async function loadForums() {
   loadingForums.value = true
   loadError.value = ''
   try {
     const result = await forumApi.getForums()
-    forumTree.value = mapForums(result.forums || [])
+    forumTree.value = mapForumTree(result.forums || [])
   } catch (reason) {
     loadError.value = reason?.message || '版块列表加载失败'
   } finally {

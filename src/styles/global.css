@@ -1,10 +1,10 @@
 :root {
   color: #263633;
-  background: #f4f7f6;
+  background: #f3f5f4;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --brand: #178f80;
-  --brand-deep: #0f7468;
+  --brand: #168b7c;
+  --brand-deep: #0d6f65;
   --brand-soft: #e9f6f3;
   --line: #e5ecea;
   --muted: #71807d;
@@ -17,16 +17,14 @@
 
 html {
   min-width: 320px;
-  background: #f4f7f6;
+  background: #f3f5f4;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 8% 0%, rgba(23, 143, 128, 0.07), transparent 26rem),
-    #f4f7f6;
+  background: #f3f5f4;
 }
 
 button,
@@ -44,50 +42,93 @@ button {
   min-height: 100vh;
 }
 
-.app-header {
+.ant-layout-header.app-header {
   position: sticky;
   z-index: 50;
   top: 0;
-  height: 68px;
+  height: 80px;
   padding: 0;
   line-height: normal;
-  background: rgba(255, 255, 255, 0.93);
-  border-bottom: 1px solid rgba(219, 231, 228, 0.9);
-  backdrop-filter: blur(18px);
+  background: #53B1A8;
+  border-bottom: 0;
 }
 
 .header-inner {
   display: flex;
   align-items: center;
-  max-width: 1440px;
+  max-width: 1168px;
   height: 100%;
   margin: 0 auto;
-  padding: 0 28px;
-  gap: 32px;
+  padding: 0 8px;
+  gap: 18px;
 }
 
 .brand {
   display: inline-flex;
-  flex: 0 0 196px;
+  flex: 0 0 141px;
   align-items: center;
-  gap: 11px;
+  justify-content: center;
+  width: 141px;
+  height: 60px;
   padding: 0;
   border: 0;
   background: transparent;
-  text-align: left;
   cursor: pointer;
 }
 
+.brand-logo {
+  display: block;
+  width: 141px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.brand-fallback {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  text-align: left;
+}
+
 .brand-mark {
-  display: grid;
-  width: 38px;
-  height: 38px;
-  place-items: center;
-  color: #fff;
-  font-size: 20px;
-  border-radius: 12px 12px 12px 4px;
-  background: linear-gradient(135deg, #28ad9c, #10766b);
-  box-shadow: 0 7px 16px rgba(23, 143, 128, 0.22);
+  position: relative;
+  display: block;
+  width: 43px;
+  height: 58px;
+  flex: 0 0 43px;
+}
+
+.brand-mark i {
+  position: absolute;
+  display: block;
+}
+
+.tree-top {
+  top: 0;
+  left: 7px;
+  width: 0;
+  height: 0;
+  border-right: 15px solid transparent;
+  border-bottom: 25px solid #0a8a3e;
+  border-left: 15px solid transparent;
+}
+
+.tree-middle {
+  top: 16px;
+  left: 1px;
+  width: 0;
+  height: 0;
+  border-right: 21px solid transparent;
+  border-bottom: 31px solid #0a8a3e;
+  border-left: 21px solid transparent;
+}
+
+.tree-trunk {
+  bottom: 0;
+  left: 17px;
+  width: 10px;
+  height: 17px;
+  background: #71512e;
 }
 
 .brand-copy {
@@ -96,27 +137,54 @@ button {
 }
 
 .brand-copy strong {
-  color: #19332f;
-  font-size: 19px;
+  color: #087c38;
+  font-size: 25px;
   line-height: 1.2;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
 }
 
 .brand-copy small {
-  margin-top: 3px;
-  color: #91a09d;
+  margin-top: 1px;
+  color: rgba(6, 93, 66, 0.78);
   font-size: 9px;
-  letter-spacing: 0.12em;
+  letter-spacing: 0;
 }
 
-.header-search {
-  width: min(460px, 38vw);
+.top-nav {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  gap: 25px;
+}
+
+.top-nav a,
+.header-login {
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.top-nav a:hover,
+.top-nav a:focus-visible,
+.top-nav a.router-link-active,
+.header-login:hover,
+.header-login:focus-visible {
+  color: #fff;
+  text-decoration: underline;
+  outline: none;
+}
+
+.header-login {
+  padding: 5px 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  margin-left: auto;
   gap: 10px;
 }
 
@@ -127,13 +195,14 @@ button {
   gap: 8px;
   padding: 4px 8px 4px 4px;
   border: 0;
-  border-radius: 22px;
+  color: #fff;
+  border-radius: 6px;
   background: transparent;
   cursor: pointer;
 }
 
 .account-button:hover {
-  background: #f0f6f4;
+  background: rgba(255, 255, 255, 0.14);
 }
 
 .account-button > span:nth-child(2) {
@@ -143,17 +212,18 @@ button {
 }
 
 .account-arrow {
-  color: #8a9895;
+  color: rgba(255, 255, 255, 0.75);
   font-size: 10px;
 }
 
 .mobile-menu-button {
   display: none;
+  color: #fff;
   font-size: 20px;
 }
 
 .shell-content {
-  min-height: calc(100vh - 68px);
+  min-height: calc(100vh - 80px);
   background: transparent;
 }
 
@@ -167,10 +237,18 @@ button {
   gap: 22px;
 }
 
+.content-grid.home-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 1168px;
+  padding: 0 8px 48px;
+  gap: 0;
+}
+
 .left-sidebar,
 .right-sidebar {
   position: sticky;
-  top: 92px;
+  top: 104px;
 }
 
 .side-nav .ant-menu {
@@ -482,11 +560,10 @@ button {
   }
 
   .brand {
-    flex-basis: auto;
+    flex-basis: 141px;
   }
 
   .brand-copy small,
-  .publish-button,
   .account-button > span:nth-child(2),
   .account-arrow,
   .left-sidebar {
@@ -497,19 +574,19 @@ button {
     display: inline-flex;
   }
 
+  .top-nav {
+    display: none;
+  }
+
   .content-grid {
     display: block;
     padding: 20px 18px 40px;
   }
 
-  .header-search {
-    width: auto;
-    flex: 1;
-  }
 }
 
 @media (max-width: 620px) {
-  .app-header {
+  .ant-layout-header.app-header {
     height: 62px;
   }
 
@@ -518,27 +595,36 @@ button {
     gap: 10px;
   }
 
-  .brand-copy,
-  .login-button,
-  .header-search .ant-input-group-addon {
+  .top-nav {
     display: none;
   }
 
-  .brand-mark {
-    width: 36px;
-    height: 36px;
+  .brand {
+    width: 106px;
+    height: 45px;
+    flex-basis: 106px;
   }
 
-  .header-search {
-    min-width: 0;
+  .brand-logo {
+    width: 106px;
+    height: 45px;
+  }
+
+  .brand-fallback {
+    transform: scale(0.76);
   }
 
   .header-actions {
+    margin-left: auto;
     gap: 2px;
   }
 
   .content-grid {
     padding: 14px 10px 32px;
+  }
+
+  .content-grid.home-grid {
+    padding: 0 0 32px;
   }
 
   .page-heading {

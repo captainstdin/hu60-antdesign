@@ -3,31 +3,41 @@
     <a-layout-header class="app-header">
       <div class="header-inner">
         <button class="brand" type="button" aria-label="返回论坛首页" @click="router.push('/')">
-          <span class="brand-mark"><CrownOutlined /></span>
-          <span class="brand-copy">
-            <strong>虎绿林</strong>
-            <small>HU60 COMMUNITY</small>
+          <img
+            v-show="brandLogoReady"
+            class="brand-logo"
+            :src="brandLogoUrl"
+            width="423"
+            height="180"
+            alt=""
+            @load="brandLogoReady = true"
+            @error="brandLogoReady = false"
+          />
+          <span v-show="!brandLogoReady" class="brand-fallback" aria-hidden="true">
+            <span class="brand-mark">
+              <i class="tree-top"></i>
+              <i class="tree-middle"></i>
+              <i class="tree-trunk"></i>
+            </span>
+            <span class="brand-copy">
+              <strong>虎绿林</strong>
+              <small>HULVLIN</small>
+            </span>
           </span>
         </button>
 
-        <a-input-search
-          v-model:value="headerSearch"
-          class="header-search"
-          allow-clear
-          placeholder="搜索帖子、用户"
-          enter-button="搜索"
-          @search="submitHeaderSearch"
-        />
+        <nav class="top-nav" aria-label="主导航">
+          <RouterLink to="/">帖子</RouterLink>
+          <RouterLink to="/favorites">收藏</RouterLink>
+          <RouterLink to="/chat">聊天</RouterLink>
+          <RouterLink to="/messages">内信</RouterLink>
+          <RouterLink to="/me">我的</RouterLink>
+        </nav>
 
         <div class="header-actions">
-          <a-button class="publish-button" type="primary" @click="router.push('/publish')">
-            <template #icon><EditOutlined /></template>
-            发布
-          </a-button>
-
           <a-dropdown v-if="isLoggedIn" placement="bottomRight">
             <button class="account-button" type="button">
-              <UserAvatar :avatar="user?._u_avatar" :uid="user?.uid" :size="32" />
+              <UserAvatar :avatar="user?._u_avatar" :uid="user?.uid" :size="34" />
               <span>{{ user?.name || '我的账号' }}</span>
               <DownOutlined class="account-arrow" />
             </button>
@@ -39,9 +49,14 @@
               </a-menu>
             </template>
           </a-dropdown>
-          <a-button v-else class="login-button" @click="openLogin">登录</a-button>
+          <button v-else class="header-login" type="button" @click="openLogin">登录</button>
 
-          <a-button class="mobile-menu-button" type="text" aria-label="打开导航" @click="drawerOpen = true">
+          <a-button
+            class="mobile-menu-button"
+            type="text"
+            aria-label="打开导航"
+            @click="drawerOpen = true"
+          >
             <MenuOutlined />
           </a-button>
         </div>
@@ -49,9 +64,9 @@
     </a-layout-header>
 
     <a-layout-content class="shell-content">
-      <div class="content-grid">
-        <aside class="left-sidebar">
-          <nav class="side-nav" aria-label="主导航">
+      <div class="content-grid" :class="{ 'home-grid': isHome }">
+        <aside v-if="!isHome" class="left-sidebar">
+          <nav class="side-nav" aria-label="页面导航">
             <a-menu mode="inline" :selected-keys="selectedKeys" :items="menuItems" @click="handleNav" />
           </nav>
 
@@ -71,10 +86,9 @@
           </router-view>
         </main>
 
-        <aside class="right-sidebar">
+        <aside v-if="!isHome" class="right-sidebar">
           <a-card class="welcome-card" :bordered="false">
-            <div class="welcome-mark"><CrownOutlined /></div>
-            <h2>欢迎来到虎绿林</h2>
+            <h2>虎绿林</h2>
             <p>一个轻松、友善、有温度的中文社区。</p>
             <a-space v-if="!isLoggedIn" class="welcome-actions">
               <a-button type="primary" @click="openLogin">立即登录</a-button>
@@ -109,6 +123,8 @@
     <a-drawer v-model:open="drawerOpen" placement="right" title="导航" :width="300">
       <a-menu mode="inline" :selected-keys="selectedKeys" :items="menuItems" @click="handleMobileNav" />
     </a-drawer>
+
+    <LoginModal />
   </a-layout>
 </template>
 
@@ -117,41 +133,53 @@ import { computed, h, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import {
-  BellOutlined,
+  AuditOutlined,
   BulbOutlined,
   CommentOutlined,
-  CrownOutlined,
   DownOutlined,
-  EditOutlined,
   HomeOutlined,
   LogoutOutlined,
   MailOutlined,
   MenuOutlined,
+  StarOutlined,
   UserOutlined,
 } from '@ant-design/icons-vue'
 
+import LoginModal from '../components/LoginModal.vue'
 import UserAvatar from '../components/UserAvatar.vue'
 import { forumApi } from '../services/forum'
+import { authDialog } from '../stores/authDialog'
 import { session } from '../stores/session'
+import { currentPermissions, hasPermission, PERMISSIONS } from '../utils/permissions'
 
 const router = useRouter()
 const route = useRoute()
 const drawerOpen = ref(false)
-const headerSearch = ref('')
+const brandLogoUrl = `${import.meta.env.BASE_URL}logo.png`
+const brandLogoReady = ref(false)
 const isLoggedIn = session.isLoggedIn
 const user = computed(() => session.state.user)
+const isHome = computed(() => route.name === 'home')
 
-const menuItems = [
+const canReview = computed(() => (
+  Boolean(user.value?.siteAdmin)
+  || hasPermission(currentPermissions(user.value), PERMISSIONS.reviewPost)
+))
+const menuItems = computed(() => [
   { key: 'home', icon: () => h(HomeOutlined), label: '论坛首页' },
+  { key: 'favorites', icon: () => h(StarOutlined), label: '我的收藏' },
   { key: 'chat', icon: () => h(CommentOutlined), label: '聊天室' },
   { key: 'messages', icon: () => h(MailOutlined), label: '内信' },
+  ...(canReview.value ? [{ key: 'reviews', icon: () => h(AuditOutlined), label: '内容审核' }] : []),
   { key: 'profile', icon: () => h(UserOutlined), label: '我的' },
-]
+])
 
 const navRoutes = {
   home: '/',
+  favorites: '/favorites',
   chat: '/chat',
   messages: '/messages',
+  reviews: '/reviews',
   profile: '/me',
 }
 
@@ -166,14 +194,8 @@ function handleMobileNav(event) {
   handleNav(event)
 }
 
-function submitHeaderSearch(value) {
-  const keywords = String(value || '').trim()
-  if (!keywords) return
-  router.push({ name: 'search', query: { keywords } })
-}
-
 function openLogin() {
-  router.push({ name: 'login', query: { redirect: route.fullPath } })
+  authDialog.show(route.fullPath)
 }
 
 async function handleAccountMenu({ key }) {

@@ -28,16 +28,29 @@
                 <a-badge :count="user._myself?.newAtInfo || 0" />
                 <RightOutlined />
               </a-list-item>
-              <a-list-item class="profile-link" @click="comingSoon('我的帖子')">
+              <a-list-item class="profile-link" @click="openMyTopics">
                 <a-list-item-meta title="我的帖子" description="我发布过的内容">
                   <template #avatar><FileTextOutlined /></template>
                 </a-list-item-meta>
                 <RightOutlined />
               </a-list-item>
-              <a-list-item class="profile-link" @click="comingSoon('我的收藏')">
+              <a-list-item class="profile-link" @click="router.push('/favorites')">
                 <a-list-item-meta title="我的收藏" description="稍后继续阅读">
                   <template #avatar><StarOutlined /></template>
                 </a-list-item-meta>
+                <RightOutlined />
+              </a-list-item>
+              <a-list-item class="profile-link" @click="openMyReplies">
+                <a-list-item-meta title="我的回复" description="我参与过的讨论">
+                  <template #avatar><CommentOutlined /></template>
+                </a-list-item-meta>
+                <RightOutlined />
+              </a-list-item>
+              <a-list-item v-if="canReview" class="profile-link" @click="router.push('/reviews')">
+                <a-list-item-meta title="内容审核" description="处理待审核帖子与回复">
+                  <template #avatar><AuditOutlined /></template>
+                </a-list-item-meta>
+                <a-badge :count="user._myself?.countReview || 0" />
                 <RightOutlined />
               </a-list-item>
             </a-list>
@@ -45,13 +58,13 @@
 
           <a-card class="surface-card profile-panel" title="关系与账号" :bordered="false">
             <a-list :split="false">
-              <a-list-item class="profile-link" @click="comingSoon('我的关注')">
+              <a-list-item class="profile-link" @click="openRelationships('follow')">
                 <a-list-item-meta title="我的关注" description="关注的社区用户">
                   <template #avatar><TeamOutlined /></template>
                 </a-list-item-meta>
                 <RightOutlined />
               </a-list-item>
-              <a-list-item class="profile-link" @click="comingSoon('黑名单')">
+              <a-list-item class="profile-link" @click="openRelationships('block')">
                 <a-list-item-meta title="黑名单" description="管理屏蔽用户">
                   <template #avatar><StopOutlined /></template>
                 </a-list-item-meta>
@@ -72,11 +85,13 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Modal, message } from 'ant-design-vue'
 import {
+  AuditOutlined,
   BellOutlined,
+  CommentOutlined,
   FileTextOutlined,
   LogoutOutlined,
   ReloadOutlined,
@@ -89,11 +104,16 @@ import PageState from '../components/PageState.vue'
 import UserAvatar from '../components/UserAvatar.vue'
 import { forumApi } from '../services/forum'
 import { session } from '../stores/session'
+import { currentPermissions, hasPermission, PERMISSIONS } from '../utils/permissions'
 
 const router = useRouter()
 const user = ref(session.state.user)
 const loading = ref(true)
 const error = ref('')
+const canReview = computed(() => (
+  Boolean(user.value?.siteAdmin)
+  || hasPermission(currentPermissions(user.value), PERMISSIONS.reviewPost)
+))
 
 async function loadProfile() {
   loading.value = true
@@ -108,8 +128,18 @@ async function loadProfile() {
   }
 }
 
-function comingSoon(name) {
-  message.info(`${name}模块正在开发中`)
+function openMyTopics() {
+  if (user.value?.name) router.push({ name: 'search', query: { username: user.value.name } })
+}
+
+function openMyReplies() {
+  if (user.value?.name) {
+    router.push({ name: 'search', query: { username: user.value.name, searchType: 'reply' } })
+  }
+}
+
+function openRelationships(type) {
+  router.push({ name: 'relationships', params: { type } })
 }
 
 function confirmLogout() {

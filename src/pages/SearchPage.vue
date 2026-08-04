@@ -17,6 +17,9 @@
         </a-form-item>
         <a-button type="primary" html-type="submit" :loading="loading">搜索</a-button>
       </div>
+      <div class="search-options">
+        <a-checkbox v-model:checked="form.searchReplies">搜索回复内容</a-checkbox>
+      </div>
     </a-form>
 
     <div v-if="hasSearched && !loading && !error" class="result-caption">
@@ -53,7 +56,7 @@ import { forumApi } from '../services/forum'
 
 const route = useRoute()
 const router = useRouter()
-const form = reactive({ keywords: '', username: '' })
+const form = reactive({ keywords: '', username: '', searchReplies: false })
 const topics = ref([])
 const page = ref(1)
 const hasNextPage = ref(false)
@@ -77,8 +80,13 @@ async function loadResults(reset = true) {
   hasSearched.value = true
 
   try {
-    const result = await forumApi.search({ ...form, page: page.value })
-    const nextTopics = result.topicList || []
+    const result = await forumApi.search({
+      keywords: form.keywords,
+      username: form.username,
+      searchType: form.searchReplies ? 'reply' : '',
+      page: page.value,
+    })
+    const nextTopics = result.topicList || result.replyList || []
     topics.value = reset ? nextTopics : [...topics.value, ...nextTopics]
     page.value = Number(result.currPage || page.value)
     hasNextPage.value = result.hasNextPage === true || page.value < Number(result.maxPage || 0)
@@ -93,6 +101,7 @@ function submitSearch() {
   const query = {}
   if (form.keywords.trim()) query.keywords = form.keywords.trim()
   if (form.username.trim()) query.username = form.username.trim()
+  if (form.searchReplies) query.searchType = 'reply'
 
   if (JSON.stringify(query) === JSON.stringify(route.query)) loadResults(true)
   else router.push({ name: 'search', query })
@@ -110,10 +119,11 @@ async function loadMore() {
 }
 
 watch(
-  () => [route.query.keywords, route.query.username],
-  ([keywords, username]) => {
+  () => [route.query.keywords, route.query.username, route.query.searchType],
+  ([keywords, username, searchType]) => {
     form.keywords = String(keywords || '')
     form.username = String(username || '')
+    form.searchReplies = searchType === 'reply'
     loadResults(true)
   },
   { immediate: true },
@@ -153,6 +163,11 @@ watch(
 
 .search-fields > .ant-btn {
   margin-bottom: 14px;
+}
+
+.search-options {
+  margin-top: -4px;
+  padding-bottom: 14px;
 }
 
 .result-caption {
