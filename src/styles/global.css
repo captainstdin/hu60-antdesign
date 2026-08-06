@@ -46,7 +46,7 @@ button {
   position: sticky;
   z-index: 50;
   top: 0;
-  height: 80px;
+  height: 68px;
   padding: 0;
   line-height: normal;
   background: #53B1A8;
@@ -223,7 +223,7 @@ button {
 }
 
 .shell-content {
-  min-height: calc(100vh - 80px);
+  min-height: calc(100vh - 68px);
   background: transparent;
 }
 
@@ -248,11 +248,15 @@ button {
 .left-sidebar,
 .right-sidebar {
   position: sticky;
-  top: 104px;
+  top: 92px;
 }
 
 .side-nav .ant-menu {
   background: transparent;
+  border-inline-end: 0 !important;
+}
+
+.mobile-drawer-nav.ant-menu-inline {
   border-inline-end: 0 !important;
 }
 
@@ -390,19 +394,6 @@ button {
   color: var(--brand);
   font-size: 10px;
   font-weight: 700;
-}
-
-.side-footer {
-  display: flex;
-  flex-wrap: wrap;
-  padding: 0 4px;
-  color: #92a09d;
-  font-size: 11px;
-  gap: 6px;
-}
-
-.side-footer a {
-  color: inherit;
 }
 
 .surface-card {
@@ -588,6 +579,10 @@ button {
 @media (max-width: 620px) {
   .ant-layout-header.app-header {
     height: 62px;
+  }
+
+  .shell-content {
+    min-height: calc(100vh - 62px);
   }
 
   .header-inner {

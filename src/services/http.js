@@ -11,9 +11,11 @@ export class ApiError extends Error {
   }
 }
 
-function makeUrl(apiPath) {
-  const token = encodeURIComponent(session.getToken())
+function makeUrl(apiPath, publicEndpoint = false) {
   const cleanPath = String(apiPath || '').replace(/^\/+/, '')
+  if (publicEndpoint) return `${API_BASE_URL}/q.php/${cleanPath}`
+
+  const token = encodeURIComponent(session.getToken())
   return `${API_BASE_URL}/q.php/${token}/${cleanPath}`
 }
 
@@ -31,7 +33,7 @@ export async function accessPost(apiPath, data = {}, options = {}) {
   const timer = window.setTimeout(() => controller.abort(), options.timeout || REQUEST_TIMEOUT)
 
   try {
-    const response = await fetch(makeUrl(apiPath), {
+    const response = await fetch(makeUrl(apiPath, options.publicEndpoint), {
       method: 'POST',
       mode: 'cors',
       headers: {

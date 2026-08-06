@@ -51,14 +51,47 @@
       </div>
     </PageState>
 
-    <div class="directory-bar">社区入口</div>
-    <nav class="community-links" aria-label="社区入口">
-      <button type="button" @click="router.push('/chat')">聊天室</button>
-      <button type="button" @click="router.push('/search')">帖子搜索</button>
-      <button type="button" @click="router.push('/publish')">发布帖子</button>
-      <button type="button" @click="router.push('/messages')">内信</button>
-      <button type="button" @click="router.push('/me')">个人中心</button>
-    </nav>
+    <section v-if="forumGroups.length" class="home-widget forum-widget" aria-labelledby="forum-directory-title">
+      <div id="forum-directory-title" class="home-widget-bar">版块</div>
+      <div class="forum-list">
+        <div v-for="group in forumGroups" :key="group.key" class="forum-list-line">
+          <div class="forum-list-parent">
+            <a :href="group.href">{{ group.name }}</a>
+          </div>
+          <div v-if="group.children.length" class="forum-list-child">
+            <a v-for="child in group.children" :key="child.key" :href="child.href">
+              {{ child.name }}
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section v-if="friendLinkItems.length" class="home-widget friend-widget" aria-labelledby="friend-links-title">
+      <div id="friend-links-title" class="home-widget-bar">虎友网站展示</div>
+      <div class="friend-links">
+        <a
+          v-for="link in friendLinkItems"
+          :key="link.key"
+          :href="link.href"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {{ link.name }}
+        </a>
+      </div>
+    </section>
+
+    <section class="home-widget community-widget" aria-labelledby="community-directory-title">
+      <div id="community-directory-title" class="home-widget-bar">社区入口</div>
+      <nav class="community-links" aria-label="社区入口">
+        <button type="button" @click="router.push('/chat')">聊天室</button>
+        <button type="button" @click="router.push('/search')">帖子搜索</button>
+        <button type="button" @click="router.push('/publish')">发布帖子</button>
+        <button type="button" @click="router.push('/messages')">内信</button>
+        <button type="button" @click="router.push('/me')">个人中心</button>
+      </nav>
+    </section>
   </section>
 </template>
 
@@ -69,6 +102,7 @@ import { ReloadOutlined, RightOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import PageState from '../components/PageState.vue'
 import TopicList from '../components/TopicList.vue'
+import { API_BASE_URL } from '../config/app'
 import { forumApi } from '../services/forum'
 import { session } from '../stores/session'
 import { hasPermission, PERMISSIONS } from '../utils/permissions'
@@ -83,9 +117,103 @@ const refreshing = ref(false)
 const error = ref('')
 const reviewCount = ref(0)
 const permissions = ref([])
+const forumGroups = ref([])
+const friendLinkItems = ref([])
 const canReview = computed(() => (
   Boolean(session.state.user?.siteAdmin) || hasPermission(permissions.value, PERMISSIONS.reviewPost)
 ))
+
+function asArray(value) {
+  if (Array.isArray(value)) return value
+  if (value && typeof value === 'object') return Object.values(value)
+  return []
+}
+
+function linkValue(item) {
+  if (typeof item === 'string') return item
+  return item?.url || item?.href || item?.link || item?.address || ''
+}
+
+function displayName(item) {
+  if (typeof item === 'string') return item
+  return item?.name || item?.title || item?.label || item?.text || ''
+}
+
+function normalizeLink(value, fallbackId = '') {
+  const raw = String(linkValue(value) || '').trim()
+  if (/^https?:\/\//i.test(raw)) return raw
+  if (raw.startsWith('/')) return raw
+  if (fallbackId) return `${API_BASE_URL}/q.php/bbs.forum.${encodeURIComponent(fallbackId)}.html`
+  return ''
+}
+
+function normalizeForumGroups(value) {
+  return asArray(value).map((item, index) => {
+    if (!item || typeof item !== 'object') return null
+    const id = item.id ?? item.forum_id ?? item.fid ?? item.value ?? ''
+    const children = asArray(item.child || item.children || item.items)
+      .map((child, childIndex) => {
+        if (!child || typeof child !== 'object') return null
+        const childId = child.id ?? child.forum_id ?? child.fid ?? child.value ?? ''
+        const name = displayName(child)
+        if (!name) return null
+        return {
+          key: `child-${childId || `${index}-${childIndex}`}`,
+          name,
+          href: normalizeLink(child, childId),
+        }
+      })
+      .filter(Boolean)
+    const name = displayName(item)
+    if (!name) return null
+    return {
+      key: `forum-${id || index}`,
+      name,
+      href: normalizeLink(item, id),
+      children,
+    }
+  }).filter(Boolean)
+}
+
+function normalizeFriendLinks(value) {
+  return asArray(value).map((item, index) => {
+    const name = displayName(item)
+    const href = normalizeLink(item)
+    if (!name || !href) return null
+    return { key: `friend-${index}-${name}`, name, href }
+  }).filter(Boolean)
+}
+
+function looksLikeForumGroups(value) {
+  return asArray(value).some((item) => item && typeof item === 'object'
+    && (item.child || item.children || item.items || item.forum_id || item.fid
+      || (item.id && !linkValue(item))))
+}
+
+function applyHomeDirectories(result) {
+  const forumSource = result.forumList ?? result.forums ?? result.forumTree
+  if (forumSource !== undefined) {
+    const groups = normalizeForumGroups(forumSource)
+    if (groups.length || !forumGroups.value.length) forumGroups.value = groups
+  }
+
+  const friendSource = result.friendLinks ?? []
+  friendLinkItems.value = normalizeFriendLinks(friendSource)
+  if (!forumGroups.value.length && looksLikeForumGroups(friendSource)) {
+    forumGroups.value = normalizeForumGroups(friendSource)
+    friendLinkItems.value = []
+  }
+}
+
+async function loadForums() {
+  if (forumGroups.value.length) return
+  try {
+    const result = await forumApi.getForums()
+    forumGroups.value = normalizeForumGroups(result?.forumList || result?.forums || result)
+  } catch {
+    // 首页版块是辅助信息，请求失败时不阻断帖子列表。
+  }
+}
 
 function getErrorMessage(reason) {
   return reason?.message || '话题加载失败，请稍后重试'
@@ -109,6 +237,7 @@ async function loadTopics(reset = false) {
     hasNextPage.value = result.hasNextPage === true || page.value < Number(result.maxPage || 0)
     reviewCount.value = Number(result._myself?.countReview || 0)
     permissions.value = result._myself?.permissions || []
+    applyHomeDirectories(result)
     if (reset && refreshing.value) message.success('已获取最新话题')
   } catch (reason) {
     error.value = getErrorMessage(reason)
@@ -129,12 +258,15 @@ async function loadMore() {
   }
 }
 
-onMounted(() => loadTopics())
+onMounted(() => {
+  loadTopics()
+  loadForums()
+})
 </script>
 
 <style scoped>
 .home-page {
-  min-height: calc(100vh - 80px);
+  min-height: calc(100vh - 68px);
   border-right: 1px solid #e3e7e6;
   border-left: 1px solid #e3e7e6;
   background: #fff;
@@ -209,20 +341,83 @@ onMounted(() => loadTopics())
   border-top: 1px solid #edf0ef;
 }
 
-.directory-bar {
-  padding: 9px 18px;
-  color: #637b77;
+.home-widget {
+  border-top: 1px solid #eee;
+  background: #fff;
+}
+
+.home-widget-bar {
+  padding: 7px 18px;
+  color: #333;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.5;
+  background: #e6f3ff;
+}
+
+.forum-list {
+  padding: 9px 18px 14px 40px;
+}
+
+.forum-list-line {
+  display: flex;
+  min-height: 35px;
+  align-items: flex-start;
+}
+
+.forum-list-parent,
+.forum-list-child {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.forum-list-parent > a,
+.forum-list-child > a {
+  display: inline-block;
+  margin: 3px;
+  padding: 5px;
+  color: #999;
+  font-size: 12px;
+  line-height: 1.25;
+  border-radius: 5px;
+  background: #eee;
+  text-decoration: none;
+}
+
+.forum-list-parent > a {
+  font-weight: 700;
+}
+
+.forum-list-parent > a:hover,
+.forum-list-parent > a:focus-visible,
+.forum-list-child > a:hover,
+.forum-list-child > a:focus-visible,
+.friend-links a:hover,
+.friend-links a:focus-visible {
+  color: #08c;
+  outline: none;
+  text-decoration: underline;
+}
+
+.friend-links {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 9px 18px 14px;
+  gap: 4px 18px;
+}
+
+.friend-links a {
+  padding: 3px 0;
+  color: #08c;
   font-size: 13px;
-  font-weight: 650;
-  border-top: 1px solid #dce7e5;
-  border-bottom: 1px solid #dce7e5;
-  background: #f2f7f6;
+  text-decoration: none;
 }
 
 .community-links {
   display: flex;
   flex-wrap: wrap;
-  padding: 15px 18px 24px;
+  padding: 12px 18px 18px;
   gap: 10px 26px;
   font-size: 13px;
 }
@@ -242,6 +437,14 @@ onMounted(() => loadTopics())
   .forum-links {
     gap: 5px;
     font-size: 13px;
+  }
+
+  .forum-list {
+    padding-left: 10px;
+  }
+
+  .forum-list-line {
+    display: block;
   }
 
   .toolbar-status > span {

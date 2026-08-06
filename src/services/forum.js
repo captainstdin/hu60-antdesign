@@ -4,7 +4,7 @@ const originQuery = { _origin: '*' }
 
 export const forumApi = {
   getSiteInfo() {
-    return accessPost(withQuery('/site.info.json', originQuery))
+    return accessPost(withQuery('/site.info.json', originQuery), {}, { publicEndpoint: true })
   },
 
   getHome(page = 1) {

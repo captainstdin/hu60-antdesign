@@ -9,7 +9,7 @@
         @keydown.enter.self="openTopic(item)"
       >
         <div class="classic-author" @click.stop>
-          <UserAvatar :avatar="item._u_avatar" :uid="item.uid" :size="36" />
+          <UserAvatar :avatar="item._u_avatar" :uid="item.uid" :size="36" shape="square" />
           <button type="button" @click="openUser(item)">
             {{ authorName(item) }}
           </button>
@@ -17,17 +17,14 @@
 
         <div class="classic-topic-main">
           <div class="classic-title-line">
-            <a-tag v-if="Number(item.essence) === 1" color="red">精华</a-tag>
             <span class="classic-title">{{ item.title || item.topic?.title || '无标题帖子' }}</span>
           </div>
           <div class="classic-meta">
-            <span class="mobile-author">{{ authorName(item) }} · </span>
             <span>{{ item.read_count ?? item.topic?.read_count ?? 0 }} 点击</span>
             <span>/</span>
             <span>{{ formatTime(item.topic?.ctime || item.ctime) }}发布</span>
-            <a-tag v-if="item.forum_name || item.topic?.forum_name" class="mobile-forum-tag" color="cyan">
-              {{ item.forum_name || item.topic?.forum_name }}
-            </a-tag>
+            <span>/</span>
+            <span>{{ item.reply_count ?? item.topic?.reply_count ?? 0 }} 评论</span>
           </div>
         </div>
 
@@ -100,18 +97,22 @@ function openUser(item) {
 
 .classic-author {
   display: flex;
+  flex-direction: column;
   min-width: 0;
   align-items: center;
-  gap: 9px;
+  gap: 4px;
 }
 
 .classic-author button {
   overflow: hidden;
   min-width: 0;
+  max-width: 100%;
   padding: 0;
   color: #677572;
   border: 0;
   background: transparent;
+  font-size: 12px;
+  text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: pointer;
@@ -136,11 +137,6 @@ function openUser(item) {
   gap: 7px;
 }
 
-.classic-title-line :deep(.ant-tag) {
-  flex: 0 0 auto;
-  margin: 0;
-}
-
 .classic-title {
   overflow: hidden;
   color: #237f9f;
@@ -157,11 +153,6 @@ function openUser(item) {
   color: #929c9a;
   font-size: 11px;
   gap: 4px;
-}
-
-.mobile-author,
-.mobile-forum-tag {
-  display: none;
 }
 
 .classic-replies {
@@ -198,29 +189,22 @@ function openUser(item) {
 
 @media (max-width: 760px) {
   .classic-topic-row {
-    grid-template-columns: 42px minmax(0, 1fr) 46px;
+    grid-template-columns: 56px minmax(0, 1fr) 46px;
     min-height: 66px;
     padding: 8px 12px !important;
     gap: 0 9px;
   }
 
-  .classic-author button,
   .classic-forum {
     display: none;
   }
 
-  .mobile-author {
-    display: inline;
-  }
-
-  .mobile-forum-tag {
-    display: inline-flex;
-    margin: 0 0 0 4px;
-    line-height: 18px;
+  .classic-author button {
+    font-size: 11px;
   }
 
   .classic-title {
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .classic-replies strong {
@@ -230,7 +214,7 @@ function openUser(item) {
 
 @media (max-width: 460px) {
   .classic-topic-row {
-    grid-template-columns: 38px minmax(0, 1fr);
+    grid-template-columns: 48px minmax(0, 1fr);
   }
 
   .classic-replies {

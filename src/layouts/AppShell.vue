@@ -110,18 +110,20 @@
               <li><span>03</span>保护隐私，不公开敏感信息</li>
             </ul>
           </a-card>
-
-          <footer class="side-footer">
-            <span>虎绿林 PC</span>
-            <span>·</span>
-            <a href="https://hu60.cn" target="_blank" rel="noopener noreferrer">访问主站</a>
-          </footer>
         </aside>
       </div>
+
+      <SiteFooter />
     </a-layout-content>
 
     <a-drawer v-model:open="drawerOpen" placement="right" title="导航" :width="300">
-      <a-menu mode="inline" :selected-keys="selectedKeys" :items="menuItems" @click="handleMobileNav" />
+      <a-menu
+        class="mobile-drawer-nav"
+        mode="inline"
+        :selected-keys="selectedKeys"
+        :items="menuItems"
+        @click="handleMobileNav"
+      />
     </a-drawer>
 
     <LoginModal />
@@ -146,6 +148,7 @@ import {
 } from '@ant-design/icons-vue'
 
 import LoginModal from '../components/LoginModal.vue'
+import SiteFooter from '../components/SiteFooter.vue'
 import UserAvatar from '../components/UserAvatar.vue'
 import { forumApi } from '../services/forum'
 import { authDialog } from '../stores/authDialog'

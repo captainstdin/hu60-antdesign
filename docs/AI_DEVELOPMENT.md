@@ -35,6 +35,7 @@
 
 | 功能 | API |
 | --- | --- |
+| 站点信息与页脚 | `/q.php/site.info.json`（公共接口，不拼接 accessToken） |
 | 首页 | `/index.index.json?_uinfo=name,avatar&p={page}` |
 | 搜索 | `/bbs.search.json?_uinfo=name,avatar&p={page}&keywords=...&username=...` |
 | 搜索回复 | `/bbs.search.json?searchType=reply&keywords=...&username=...` |
