@@ -43,9 +43,9 @@
     >
       <TopicList :topics="topics" />
       <div v-if="topics.length" class="home-pagination">
-        <a-button v-if="hasNextPage" :loading="loadingMore" @click="loadMore">
-          下一页
-          <template #icon><RightOutlined /></template>
+        <a-button v-if="hasNextPage" class="load-more-btn" :loading="loadingMore" @click="loadMore">
+          加载更多
+          <template #icon><DownOutlined /></template>
         </a-button>
         <span v-else>没有更多帖子了</span>
       </div>
@@ -98,7 +98,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ReloadOutlined, RightOutlined } from '@ant-design/icons-vue'
+import { ReloadOutlined, DownOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import PageState from '../components/PageState.vue'
 import TopicList from '../components/TopicList.vue'
@@ -339,6 +339,10 @@ onMounted(() => {
   color: #9aa5a3;
   font-size: 12px;
   border-top: 1px solid #edf0ef;
+}
+
+.load-more-btn {
+  min-width: 200px;
 }
 
 .home-widget {

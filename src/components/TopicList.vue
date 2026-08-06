@@ -79,11 +79,15 @@ function openUser(item) {
   overflow: hidden;
 }
 
+.classic-topic-list :deep(.ant-list-item) {
+  margin-bottom: 0 !important;
+}
+
 .classic-topic-row {
   display: grid !important;
   grid-template-columns: 150px minmax(0, 1fr) 72px 120px;
-  min-height: 64px;
-  padding: 7px 18px !important;
+  min-height: 48px;
+  padding: 3px 18px !important;
   cursor: pointer;
   transition: background-color 0.15s ease;
   gap: 0 16px;
@@ -100,7 +104,7 @@ function openUser(item) {
   flex-direction: column;
   min-width: 0;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
 }
 
 .classic-author button {
@@ -149,7 +153,7 @@ function openUser(item) {
 .classic-meta {
   display: flex;
   align-items: center;
-  margin-top: 3px;
+  margin-top: 1px;
   color: #929c9a;
   font-size: 11px;
   gap: 4px;
@@ -190,8 +194,8 @@ function openUser(item) {
 @media (max-width: 760px) {
   .classic-topic-row {
     grid-template-columns: 56px minmax(0, 1fr) 46px;
-    min-height: 66px;
-    padding: 8px 12px !important;
+    min-height: 52px;
+    padding: 4px 12px !important;
     gap: 0 9px;
   }
 
