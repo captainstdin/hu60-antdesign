@@ -95,7 +95,7 @@ function openUser(item) {
 
 .classic-topic-row:hover,
 .classic-topic-row:focus-visible {
-  background: #f6fbfa;
+  background: var(--surface-hover);
   outline: none;
 }
 
@@ -112,7 +112,7 @@ function openUser(item) {
   min-width: 0;
   max-width: 100%;
   padding: 0;
-  color: #677572;
+  color: var(--text-subtle);
   border: 0;
   background: transparent;
   font-size: 12px;
@@ -143,7 +143,7 @@ function openUser(item) {
 
 .classic-title {
   overflow: hidden;
-  color: #237f9f;
+  color: var(--link);
   font-size: 15px;
   font-weight: 500;
   text-overflow: ellipsis;
@@ -154,7 +154,7 @@ function openUser(item) {
   display: flex;
   align-items: center;
   margin-top: 1px;
-  color: #929c9a;
+  color: var(--muted-soft);
   font-size: 11px;
   gap: 4px;
 }
@@ -163,7 +163,7 @@ function openUser(item) {
   display: flex;
   align-self: center;
   flex-direction: column;
-  color: #8d9896;
+  color: var(--muted);
   text-align: center;
 }
 
@@ -185,7 +185,7 @@ function openUser(item) {
 .classic-forum {
   overflow: hidden;
   align-self: center;
-  color: #7c8785;
+  color: var(--muted);
   font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;

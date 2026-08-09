@@ -98,9 +98,9 @@ onMounted(async () => {
   width: 100%;
   margin-top: 15px;
   padding: 0 28px 15px;
-  color: #333;
+  color: var(--text);
   font-size: 13px;
-  background: #fff;
+  background: var(--footer-bg);
 }
 
 .site-footer-line,
@@ -121,7 +121,7 @@ onMounted(async () => {
 }
 
 .site-footer a {
-  color: #666;
+  color: var(--text-subtle);
   text-decoration: none;
 }
 
@@ -129,24 +129,24 @@ onMounted(async () => {
 .site-footer a:focus-visible,
 .site-footer-record :deep(a:hover),
 .site-footer-record :deep(a:focus-visible) {
-  color: #08c;
+  color: var(--link);
   text-decoration: underline;
   outline: none;
 }
 
 .site-theme-separator {
   margin: 0 5px;
-  color: #999;
+  color: var(--muted-soft);
 }
 
 .site-footer-record {
   margin-top: 7px;
-  color: #333;
+  color: var(--text);
 }
 
 .site-footer-record :deep(a) {
   margin-left: 4px;
-  color: #666;
+  color: var(--text-subtle);
   text-decoration: none;
 }
 

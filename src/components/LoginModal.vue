@@ -137,7 +137,7 @@ watch(
   height: 42px;
   flex: 0 0 auto;
   place-items: center;
-  color: #fff;
+  color: var(--on-brand);
   font-size: 18px;
   border-radius: 6px;
   background: var(--brand);
@@ -145,7 +145,7 @@ watch(
 
 .login-heading h2 {
   margin: 0;
-  color: #263b37;
+  color: var(--text-heading);
   font-size: 20px;
 }
 

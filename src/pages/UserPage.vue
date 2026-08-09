@@ -186,15 +186,18 @@ watch(() => props.uid, loadUser, { immediate: true })
   display: flex;
   justify-content: center;
   padding: 44px 20px 0;
-  background:
-    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.4), transparent 12rem),
-    linear-gradient(135deg, #bfe7df, #64b8a9);
+  background: var(--user-cover-bg);
 }
 
 .user-cover :deep(.ant-avatar) {
   transform: translateY(32px);
-  border: 5px solid #fff;
-  box-shadow: 0 10px 24px rgba(25, 71, 63, 0.16);
+  border: 5px solid var(--avatar-ring);
+  box-shadow: var(--shadow-soft);
+}
+
+:global(html[data-theme="cyberpunk"]) .user-cover {
+  background-position: -1px -1px, -1px -1px, center;
+  background-size: 48px 48px, 48px 48px, auto;
 }
 
 .user-info {
@@ -204,13 +207,13 @@ watch(() => props.uid, loadUser, { immediate: true })
 
 .user-info h1 {
   margin: 8px 0 0;
-  color: #273e39;
+  color: var(--text-heading);
   font-size: 25px;
 }
 
 .user-info .uid {
   margin: 4px 0 24px;
-  color: #82908d;
+  color: var(--muted);
   font-size: 12px;
 }
 

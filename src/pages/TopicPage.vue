@@ -103,7 +103,7 @@
                       </a>
                     </header>
 
-                    <RichContent :html="item.content" collapsible />
+                    <RichContent :html="item.content" collapsible image-preview image-width="50%" />
 
                     <footer class="floor-actions">
                       <a-button type="text" size="small" @click="quoteUser(item)">@Ta</a-button>
@@ -751,7 +751,7 @@ watch(() => props.id, () => {
 
 .topic-title-line h1 {
   margin: 0;
-  color: #263d39;
+  color: var(--text-heading);
   font-size: 18px;
   font-weight: 600;
   line-height: 1.4;
@@ -779,7 +779,7 @@ watch(() => props.id, () => {
   align-items: center;
   flex-wrap: wrap;
   margin-top: 5px;
-  color: #7d8c89;
+  color: var(--muted);
   font-size: 11px;
   gap: 4px 14px;
 }
@@ -794,15 +794,15 @@ watch(() => props.id, () => {
   justify-content: space-between;
   min-height: 34px;
   padding: 4px 12px 4px 16px;
-  color: #566965;
+  color: var(--text-subtle);
   font-size: 12px;
-  border-top: 1px solid #dce8e6;
-  border-bottom: 1px solid #dce8e6;
-  background: #f3f8f7;
+  border-top: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line-strong);
+  background: var(--surface-soft);
 }
 
 .owner-floor {
-  box-shadow: inset 3px 0 rgba(22, 139, 124, 0.55);
+  box-shadow: inset 3px 0 rgba(var(--brand-rgb), 0.65);
 }
 
 .floor-item {
@@ -821,8 +821,8 @@ watch(() => props.id, () => {
   align-items: center;
   flex-direction: column;
   padding: 12px 8px 10px;
-  border-right: 1px solid #e8eeec;
-  background: #f7faf9;
+  border-right: 1px solid var(--line);
+  background: var(--surface-tint);
 }
 
 .floor-user-copy {
@@ -844,7 +844,7 @@ watch(() => props.id, () => {
   overflow: hidden;
   max-width: 100%;
   margin: 5px 0 3px;
-  color: #31514b;
+  color: var(--text-heading);
   font-size: 12px;
   font-weight: 600;
   text-overflow: ellipsis;
@@ -870,9 +870,9 @@ watch(() => props.id, () => {
   justify-content: space-between;
   margin-bottom: 8px;
   padding-bottom: 6px;
-  color: #8a9895;
+  color: var(--muted);
   font-size: 11px;
-  border-bottom: 1px dashed #e3eae8;
+  border-bottom: 1px dashed var(--line);
 }
 
 .floor-header > div {
@@ -886,7 +886,7 @@ watch(() => props.id, () => {
 }
 
 .floor-number {
-  color: #7e918d;
+  color: var(--muted);
 }
 
 .floor-actions {
@@ -907,13 +907,13 @@ watch(() => props.id, () => {
   align-items: center;
   justify-content: center;
   padding: 9px 12px;
-  border-top: 1px solid #edf1f0;
+  border-top: 1px solid var(--line-soft);
 }
 
 .reply-panel {
   padding: 11px 16px 13px;
-  border-top: 1px solid #dce8e6;
-  background: #fbfcfc;
+  border-top: 1px solid var(--line-strong);
+  background: var(--surface-tint);
 }
 
 .manage-warning {
@@ -929,7 +929,7 @@ watch(() => props.id, () => {
 
 .reply-title h2 {
   margin: 0;
-  color: #2b403c;
+  color: var(--text-heading);
   font-size: 15px;
   font-weight: 600;
 }
@@ -987,7 +987,7 @@ watch(() => props.id, () => {
     flex-direction: row;
     padding: 7px 10px;
     border-right: 0;
-    border-bottom: 1px solid #e8eeec;
+    border-bottom: 1px solid var(--line);
     gap: 8px;
   }
 

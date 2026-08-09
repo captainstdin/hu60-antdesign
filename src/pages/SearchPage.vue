@@ -174,16 +174,16 @@ watch(
   display: flex;
   justify-content: space-between;
   padding: 16px 22px;
-  color: #51635f;
+  color: var(--text-subtle);
   font-size: 13px;
-  border-top: 1px solid #e5ecea;
-  border-bottom: 1px solid #e5ecea;
-  background: #fbfdfc;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-tint);
 }
 
 .result-caption span:last-child,
 .result-end {
-  color: #96a29f;
+  color: var(--muted-soft);
   font-size: 12px;
 }
 

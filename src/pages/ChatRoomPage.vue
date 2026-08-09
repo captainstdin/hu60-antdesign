@@ -32,7 +32,7 @@
               <span>#{{ floorNumber(item, index) }}</span>
               <time>{{ formatTime(item.ctime || item.ztime) }}</time>
             </header>
-            <RichContent :html="messageContent(item)" collapsible />
+            <RichContent :html="messageContent(item)" collapsible image-preview image-width="50%" />
             <button class="chat-at" type="button" @click="quoteUser(item)">@Ta</button>
           </div>
         </article>
@@ -167,9 +167,9 @@ onUnmounted(() => window.clearInterval(refreshTimer))
 <style scoped>
 .chat-room-page {
   overflow: hidden;
-  border: 1px solid #dfe7e5;
+  border: 1px solid var(--line-strong);
   border-radius: 6px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: var(--shadow);
 }
 
@@ -179,8 +179,8 @@ onUnmounted(() => window.clearInterval(refreshTimer))
   justify-content: space-between;
   min-height: 62px;
   padding: 9px 16px;
-  border-bottom: 1px solid #e5ebe9;
-  background: #f7faf9;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-tint);
 }
 
 .chat-header > div,
@@ -192,12 +192,12 @@ onUnmounted(() => window.clearInterval(refreshTimer))
 
 .chat-header h1 {
   margin: 0;
-  color: #29423d;
+  color: var(--text-heading);
   font-size: 18px;
 }
 
 .chat-header-actions span {
-  color: #7c8b88;
+  color: var(--muted);
   font-size: 12px;
 }
 
@@ -230,22 +230,22 @@ onUnmounted(() => window.clearInterval(refreshTimer))
 .chat-bubble {
   min-width: 0;
   padding: 10px 13px 7px;
-  border: 1px solid #e2e9e7;
+  border: 1px solid var(--line);
   border-radius: 6px;
-  background: #fbfdfc;
+  background: var(--surface-raised);
 }
 
 .chat-bubble header {
   display: flex;
   align-items: center;
   margin-bottom: 6px;
-  color: #94a09d;
+  color: var(--muted-soft);
   font-size: 11px;
   gap: 8px;
 }
 
 .chat-bubble header button {
-  color: #28796e;
+  color: var(--brand-deep);
   font-size: 12px;
   font-weight: 650;
 }
@@ -253,7 +253,7 @@ onUnmounted(() => window.clearInterval(refreshTimer))
 .chat-at {
   display: block;
   margin-left: auto;
-  color: #65807b;
+  color: var(--text-subtle);
   font-size: 11px;
 }
 
@@ -262,16 +262,16 @@ onUnmounted(() => window.clearInterval(refreshTimer))
   align-items: center;
   justify-content: center;
   padding: 12px;
-  color: #7d8b88;
+  color: var(--muted);
   font-size: 12px;
-  border-top: 1px solid #e8eeec;
+  border-top: 1px solid var(--line);
   gap: 10px;
 }
 
 .chat-composer {
   padding: 14px 16px 16px;
-  border-top: 1px solid #dfe7e5;
-  background: #f8faf9;
+  border-top: 1px solid var(--line-strong);
+  background: var(--surface-soft);
 }
 
 .chat-composer > div:last-child {

@@ -56,7 +56,7 @@
             </a-button>
           </header>
 
-          <RichContent :html="reviewContent(item)" collapsible />
+          <RichContent :html="reviewContent(item)" collapsible image-preview image-width="50%" />
 
           <a-alert
             v-if="reviewNote(item)"
@@ -305,22 +305,22 @@ watch(
   align-items: center;
   justify-content: space-between;
   padding: 20px 22px;
-  border: 1px solid #dfe7e5;
+  border: 1px solid var(--line-strong);
   border-radius: 6px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: var(--shadow);
   gap: 14px;
 }
 
 .review-header h1 {
   margin: 0;
-  color: #29413d;
+  color: var(--text-heading);
   font-size: 22px;
 }
 
 .review-header p {
   margin: 5px 0 0;
-  color: #81908d;
+  color: var(--muted);
   font-size: 13px;
 }
 
@@ -347,9 +347,9 @@ watch(
 
 .review-item {
   padding: 18px 20px;
-  border: 1px solid #dfe7e5;
+  border: 1px solid var(--line-strong);
   border-radius: 6px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: var(--shadow);
 }
 
@@ -359,9 +359,9 @@ watch(
   justify-content: space-between;
   margin-bottom: 14px;
   padding-bottom: 10px;
-  color: #929e9b;
+  color: var(--muted-soft);
   font-size: 11px;
-  border-bottom: 1px dashed #e2e9e7;
+  border-bottom: 1px dashed var(--line);
   gap: 12px;
 }
 
@@ -374,7 +374,7 @@ watch(
 
 .review-author {
   padding: 0;
-  color: #287b70;
+  color: var(--brand-deep);
   font-weight: 650;
   border: 0;
   background: transparent;
@@ -391,7 +391,7 @@ watch(
   align-items: center;
   margin-top: 16px;
   padding-top: 14px;
-  border-top: 1px solid #edf1f0;
+  border-top: 1px solid var(--line-soft);
   gap: 10px;
 }
 
@@ -400,7 +400,7 @@ watch(
   align-items: center;
   justify-content: center;
   padding: 14px;
-  color: #798885;
+  color: var(--muted);
   font-size: 12px;
   gap: 12px;
 }

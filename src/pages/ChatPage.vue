@@ -96,7 +96,7 @@ onMounted(loadRooms)
 
 .room-list {
   overflow: hidden;
-  border: 1px solid #e5ecea;
+  border: 1px solid var(--line);
   border-radius: 6px;
 }
 
@@ -107,18 +107,18 @@ onMounted(loadRooms)
 
 .room-row:hover,
 .room-row:focus-visible {
-  background: #f6fbfa;
+  background: var(--surface-hover);
   outline: none;
 }
 
 .room-avatar {
   color: var(--brand);
-  background: #e3f3ef;
+  background: var(--brand-soft);
 }
 
 .room-time {
   margin: 0 14px;
-  color: #8a9895;
+  color: var(--muted);
   font-size: 12px;
 }
 </style>

@@ -267,10 +267,10 @@ onMounted(() => {
 <style scoped>
 .home-page {
   min-height: calc(100vh - 68px);
-  border-right: 1px solid #e3e7e6;
-  border-left: 1px solid #e3e7e6;
-  background: #fff;
-  box-shadow: 0 7px 18px rgba(35, 67, 62, 0.08);
+  border-right: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
 }
 
 .forum-toolbar {
@@ -279,9 +279,9 @@ onMounted(() => {
   justify-content: space-between;
   min-height: 38px;
   padding: 0 12px 0 18px;
-  color: #237f9f;
-  border-bottom: 1px solid #e2eef2;
-  background: #e7f4fb;
+  color: var(--link);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-accent);
 }
 
 .forum-links {
@@ -299,7 +299,7 @@ onMounted(() => {
 .forum-links button,
 .community-links button {
   padding: 0;
-  color: #237f9f;
+  color: var(--link);
   border: 0;
   background: transparent;
   cursor: pointer;
@@ -309,13 +309,13 @@ onMounted(() => {
 .forum-links button:focus-visible,
 .community-links button:hover,
 .community-links button:focus-visible {
-  color: #0f665d;
+  color: var(--link-hover);
   text-decoration: underline;
   outline: none;
 }
 
 .forum-links .active {
-  color: #176d8e;
+  color: var(--link-active);
   font-weight: 650;
 }
 
@@ -323,22 +323,22 @@ onMounted(() => {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
-  color: #7e999f;
+  color: var(--muted);
   font-size: 12px;
   gap: 4px;
 }
 
 .toolbar-status :deep(.ant-btn) {
-  color: #237f9f;
+  color: var(--link);
 }
 
 .home-pagination {
   display: flex;
   justify-content: center;
   padding: 18px;
-  color: #9aa5a3;
+  color: var(--muted-soft);
   font-size: 12px;
-  border-top: 1px solid #edf0ef;
+  border-top: 1px solid var(--line-soft);
 }
 
 .load-more-btn {
@@ -346,17 +346,17 @@ onMounted(() => {
 }
 
 .home-widget {
-  border-top: 1px solid #eee;
-  background: #fff;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
 }
 
 .home-widget-bar {
   padding: 7px 18px;
-  color: #333;
+  color: var(--text);
   font-size: 15px;
   font-weight: 400;
   line-height: 1.5;
-  background: #e6f3ff;
+  background: var(--surface-accent);
 }
 
 .forum-list {
@@ -381,11 +381,11 @@ onMounted(() => {
   display: inline-block;
   margin: 3px;
   padding: 5px;
-  color: #999;
+  color: var(--muted);
   font-size: 12px;
   line-height: 1.25;
   border-radius: 5px;
-  background: #eee;
+  background: var(--surface-soft);
   text-decoration: none;
 }
 
@@ -399,7 +399,7 @@ onMounted(() => {
 .forum-list-child > a:focus-visible,
 .friend-links a:hover,
 .friend-links a:focus-visible {
-  color: #08c;
+  color: var(--link-hover);
   outline: none;
   text-decoration: underline;
 }
@@ -413,7 +413,7 @@ onMounted(() => {
 
 .friend-links a {
   padding: 3px 0;
-  color: #08c;
+  color: var(--link);
   font-size: 13px;
   text-decoration: none;
 }

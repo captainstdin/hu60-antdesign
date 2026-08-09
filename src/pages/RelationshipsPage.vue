@@ -242,7 +242,7 @@ watch(
 }
 
 .relationship-row :deep(.ant-list-item-meta-title span) {
-  color: #96a19f;
+  color: var(--muted-soft);
   font-size: 11px;
   font-weight: 400;
 }
@@ -250,7 +250,7 @@ watch(
 .avatar-button,
 .user-name {
   padding: 0;
-  color: #26796e;
+  color: var(--brand-deep);
   border: 0;
   background: transparent;
   cursor: pointer;
@@ -265,9 +265,9 @@ watch(
   align-items: center;
   justify-content: center;
   padding: 16px;
-  color: #778783;
+  color: var(--muted);
   font-size: 12px;
-  border-top: 1px solid #e8eeec;
+  border-top: 1px solid var(--line);
   gap: 12px;
 }
 

@@ -24,6 +24,25 @@
               <small>HULVLIN</small>
             </span>
           </span>
+          <span class="brand-cyber-logo" aria-hidden="true">
+            <img
+              v-show="brandCyberLogoReady"
+              class="brand-cyber-image"
+              :src="brandCyberLogoUrl"
+              width="423"
+              height="180"
+              alt=""
+              @load="brandCyberLogoReady = true"
+              @error="brandCyberLogoReady = false"
+            />
+            <span v-show="!brandCyberLogoReady" class="brand-cyber-fallback">
+              <span class="brand-cyber-mark"></span>
+              <span class="brand-cyber-copy">
+                <strong>虎绿林</strong>
+                <small>HULVLIN</small>
+              </span>
+            </span>
+          </span>
         </button>
 
         <nav class="top-nav" aria-label="主导航">
@@ -35,6 +54,47 @@
         </nav>
 
         <div class="header-actions">
+          <a-dropdown placement="bottomRight" :trigger="['click']">
+            <a-button
+              class="theme-button"
+              type="text"
+              :aria-label="`切换主题，当前为${currentThemeLabel}`"
+              :title="`主题：${currentThemeLabel}`"
+            >
+              <BgColorsOutlined />
+            </a-button>
+            <template #overlay>
+              <a-menu
+                class="theme-menu"
+                :selected-keys="[themeStore.state.current]"
+                @click="handleThemeMenu"
+              >
+                <a-menu-item v-for="option in themeOptions" :key="option.key">
+                  <span class="theme-menu-item">
+                    <span
+                      class="theme-swatch"
+                      :style="{
+                        '--theme-swatch-1': option.swatches[0],
+                        '--theme-swatch-2': option.swatches[1],
+                        '--theme-swatch-3': option.swatches[2],
+                      }"
+                      aria-hidden="true"
+                    >
+                      <i></i>
+                      <i></i>
+                      <i></i>
+                    </span>
+                    <span>{{ option.shortLabel }}</span>
+                    <CheckOutlined
+                      v-if="option.key === themeStore.state.current"
+                      class="theme-menu-check"
+                    />
+                  </span>
+                </a-menu-item>
+              </a-menu>
+            </template>
+          </a-dropdown>
+
           <a-dropdown v-if="isLoggedIn" placement="bottomRight">
             <button class="account-button" type="button">
               <UserAvatar :avatar="user?._u_avatar" :uid="user?.uid" :size="34" />
@@ -136,7 +196,9 @@ import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import {
   AuditOutlined,
+  BgColorsOutlined,
   BulbOutlined,
+  CheckOutlined,
   CommentOutlined,
   DownOutlined,
   HomeOutlined,
@@ -150,19 +212,24 @@ import {
 import LoginModal from '../components/LoginModal.vue'
 import SiteFooter from '../components/SiteFooter.vue'
 import UserAvatar from '../components/UserAvatar.vue'
+import { API_BASE_URL } from '../config/app'
 import { forumApi } from '../services/forum'
 import { authDialog } from '../stores/authDialog'
 import { session } from '../stores/session'
+import { themeOptions, themeStore } from '../stores/theme'
 import { currentPermissions, hasPermission, PERMISSIONS } from '../utils/permissions'
 
 const router = useRouter()
 const route = useRoute()
 const drawerOpen = ref(false)
 const brandLogoUrl = `${import.meta.env.BASE_URL}logo.png`
+const brandCyberLogoUrl = `${API_BASE_URL}/tpl/classic/img/hulvlin3.png`
 const brandLogoReady = ref(false)
+const brandCyberLogoReady = ref(false)
 const isLoggedIn = session.isLoggedIn
 const user = computed(() => session.state.user)
 const isHome = computed(() => route.name === 'home')
+const currentThemeLabel = computed(() => themeStore.currentOption.value.label)
 
 const canReview = computed(() => (
   Boolean(user.value?.siteAdmin)
@@ -199,6 +266,10 @@ function handleMobileNav(event) {
 
 function openLogin() {
   authDialog.show(route.fullPath)
+}
+
+function handleThemeMenu({ key }) {
+  themeStore.setTheme(key)
 }
 
 async function handleAccountMenu({ key }) {

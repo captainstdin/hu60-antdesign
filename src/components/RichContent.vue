@@ -1,8 +1,12 @@
 <template>
-  <div class="rich-content-shell">
+  <div class="rich-content-shell" :style="contentStyle">
     <div
       class="rich-content"
-      :class="{ collapsed: collapsible && canCollapse && !expanded }"
+      :class="{
+        collapsed: collapsible && canCollapse && !expanded,
+        'has-image-width': imageWidth,
+        'image-previewable': imagePreview,
+      }"
       v-html="safeHtml"
       @click="handleContentClick"
     />
@@ -16,6 +20,16 @@
       <UpOutlined v-if="expanded" />
       <DownOutlined v-else />
     </button>
+    <a-modal
+      v-model:open="previewOpen"
+      centered
+      destroy-on-close
+      :footer="null"
+      :width="960"
+      wrap-class-name="rich-content-preview-modal"
+    >
+      <img v-if="previewSrc" class="rich-content-preview-image" :src="previewSrc" :alt="previewAlt" />
+    </a-modal>
   </div>
 </template>
 
@@ -29,14 +43,34 @@ import { sanitizeHtml } from '../utils/content'
 const props = defineProps({
   html: { type: String, default: '' },
   collapsible: { type: Boolean, default: false },
+  imagePreview: { type: Boolean, default: false },
+  imageWidth: { type: String, default: '' },
 })
 
 const router = useRouter()
 const expanded = ref(false)
+const previewOpen = ref(false)
+const previewSrc = ref('')
+const previewAlt = ref('图片预览')
 const safeHtml = computed(() => sanitizeHtml(props.html))
 const canCollapse = computed(() => String(props.html || '').length > 5000)
+const contentStyle = computed(() => (
+  props.imageWidth ? { '--rich-content-image-width': props.imageWidth } : undefined
+))
 
 function handleContentClick(event) {
+  const image = event.target?.closest?.('img')
+  if (props.imagePreview && image && !image.classList?.contains('hu60_face')) {
+    const src = image.currentSrc || image.getAttribute('src') || image.src
+    if (src) {
+      event.preventDefault()
+      previewSrc.value = src
+      previewAlt.value = image.getAttribute('alt') || '图片预览'
+      previewOpen.value = true
+      return
+    }
+  }
+
   const anchor = event.target?.closest?.('a[href]')
   if (!anchor) return
 
@@ -64,6 +98,8 @@ function handleContentClick(event) {
 
 watch(() => props.html, () => {
   expanded.value = false
+  previewOpen.value = false
+  previewSrc.value = ''
 })
 </script>
 
@@ -74,7 +110,7 @@ watch(() => props.html, () => {
 
 .rich-content {
   min-height: 36px;
-  color: #2f403d;
+  color: var(--text);
   font-size: 14px;
   line-height: 1.85;
   overflow-wrap: anywhere;
@@ -92,7 +128,7 @@ watch(() => props.html, () => {
   bottom: 0;
   left: 0;
   height: 72px;
-  background: linear-gradient(transparent, #fff);
+  background: linear-gradient(transparent, var(--surface));
   content: '';
   pointer-events: none;
 }
@@ -105,25 +141,35 @@ watch(() => props.html, () => {
   border-radius: 4px;
 }
 
+.rich-content.has-image-width :deep(img:not(.hu60_face)) {
+  display: block;
+  width: min(var(--rich-content-image-width), 100%) !important;
+  height: auto !important;
+}
+
+.rich-content.image-previewable :deep(img:not(.hu60_face)) {
+  cursor: zoom-in;
+}
+
 .rich-content :deep(iframe) {
   width: min(100%, 760px);
   min-height: 360px;
-  border: 1px solid #e1e8e6;
+  border: 1px solid var(--line-strong);
 }
 
 .rich-content :deep(pre) {
   max-width: 100%;
   padding: 14px 16px;
   overflow: auto;
-  border: 1px solid #e1e7e5;
+  border: 1px solid var(--line-strong);
   border-radius: 4px;
-  background: #f5f7f6;
+  background: var(--surface-code);
 }
 
 .rich-content :deep(code) {
   padding: 2px 5px;
   border-radius: 3px;
-  background: #f0f3f2;
+  background: var(--surface-code-inline);
   font-family: Consolas, Monaco, monospace;
 }
 
@@ -135,9 +181,9 @@ watch(() => props.html, () => {
 .rich-content :deep(blockquote) {
   margin: 12px 0;
   padding: 8px 14px;
-  color: #61716e;
-  border-left: 3px solid #80bcb3;
-  background: #f6faf9;
+  color: var(--text-subtle);
+  border-left: 3px solid var(--quote-border);
+  background: var(--surface-quote);
 }
 
 .rich-content :deep(table) {
@@ -150,7 +196,7 @@ watch(() => props.html, () => {
 .rich-content :deep(th),
 .rich-content :deep(td) {
   padding: 7px 10px;
-  border: 1px solid #dfe7e5;
+  border: 1px solid var(--line-strong);
 }
 
 .rich-content :deep(.hu60_face) {
@@ -163,7 +209,7 @@ watch(() => props.html, () => {
 .rich-content :deep(.userinfo) {
   color: var(--brand);
   border-radius: 3px;
-  background: #e9f5f2;
+  background: var(--brand-soft);
 }
 
 .content-fold-button {
@@ -171,11 +217,23 @@ watch(() => props.html, () => {
   align-items: center;
   margin: 8px auto 0;
   padding: 5px 10px;
-  color: #47736c;
+  color: var(--link);
   font-size: 12px;
   border: 0;
   background: transparent;
   cursor: pointer;
   gap: 5px;
+}
+
+.rich-content-preview-image {
+  display: block;
+  max-width: 100%;
+  max-height: calc(90vh - 96px);
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+:global(.rich-content-preview-modal .ant-modal-body) {
+  padding: 12px;
 }
 </style>

@@ -288,13 +288,13 @@ watch(() => [route.query.composeUid, route.query.composeName], ([uid, name]) => 
   align-items: center;
   justify-content: space-between;
   margin-bottom: 14px;
-  color: #82908d;
+  color: var(--muted);
   font-size: 12px;
 }
 
 .message-list {
   overflow: hidden;
-  border: 1px solid #e3eae8;
+  border: 1px solid var(--line);
   border-radius: 6px;
 }
 
@@ -305,7 +305,7 @@ watch(() => [route.query.composeUid, route.query.composeName], ([uid, name]) => 
 
 .message-row:hover,
 .message-row:focus-visible {
-  background: #f6fbfa;
+  background: var(--surface-hover);
   outline: none;
 }
 
@@ -319,7 +319,7 @@ watch(() => [route.query.composeUid, route.query.composeName], ([uid, name]) => 
 .message-row > time {
   flex: 0 0 auto;
   margin: 0 14px;
-  color: #8e9b98;
+  color: var(--muted-soft);
   font-size: 11px;
 }
 
@@ -328,7 +328,7 @@ watch(() => [route.query.composeUid, route.query.composeName], ([uid, name]) => 
   align-items: center;
   justify-content: center;
   padding-top: 16px;
-  color: #7f8d8a;
+  color: var(--muted);
   font-size: 12px;
   gap: 10px;
 }

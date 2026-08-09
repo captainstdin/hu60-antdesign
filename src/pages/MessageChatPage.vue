@@ -24,7 +24,7 @@
               <span>{{ senderName(item) }}</span>
               <time>{{ formatTime(item.ctime || item.time) }}</time>
             </header>
-            <RichContent :html="messageContent(item)" />
+            <RichContent :html="messageContent(item)" image-preview image-width="50%" />
           </div>
         </article>
       </section>
@@ -137,9 +137,9 @@ watch(() => props.uid, () => {
 <style scoped>
 .message-chat-page {
   overflow: hidden;
-  border: 1px solid #dfe7e5;
+  border: 1px solid var(--line-strong);
   border-radius: 6px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: var(--shadow);
 }
 
@@ -149,19 +149,19 @@ watch(() => props.uid, () => {
   align-items: center;
   min-height: 64px;
   padding: 8px 14px;
-  border-bottom: 1px solid #e4ebe9;
-  background: #f7faf9;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-tint);
   gap: 8px;
 }
 
 .conversation-header h1 {
   margin: 0;
-  color: #2e4641;
+  color: var(--text-heading);
   font-size: 17px;
 }
 
 .conversation-header span {
-  color: #8b9996;
+  color: var(--muted-soft);
   font-size: 10px;
 }
 
@@ -194,22 +194,22 @@ watch(() => props.uid, () => {
 .conversation-stream article.mine > div {
   grid-row: 1;
   grid-column: 1;
-  background: #eaf6f3;
+  background: var(--brand-soft);
 }
 
 .conversation-stream article > div {
   min-width: 0;
   padding: 9px 12px;
-  border: 1px solid #e1e8e6;
+  border: 1px solid var(--line-strong);
   border-radius: 6px;
-  background: #fafcfc;
+  background: var(--surface-raised);
 }
 
 .conversation-stream header {
   display: flex;
   justify-content: space-between;
   margin-bottom: 5px;
-  color: #7b8b87;
+  color: var(--muted);
   font-size: 10px;
   gap: 12px;
 }
@@ -219,16 +219,16 @@ watch(() => props.uid, () => {
   align-items: center;
   justify-content: center;
   padding: 10px;
-  color: #82908d;
+  color: var(--muted);
   font-size: 12px;
-  border-top: 1px solid #e6ecea;
+  border-top: 1px solid var(--line);
   gap: 9px;
 }
 
 .conversation-composer {
   padding: 14px 16px 16px;
-  border-top: 1px solid #dfe7e5;
-  background: #f8faf9;
+  border-top: 1px solid var(--line-strong);
+  background: var(--surface-soft);
 }
 
 .conversation-composer > .ant-btn {

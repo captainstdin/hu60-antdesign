@@ -35,3 +35,5 @@ npm run build
 ## 开发进度
 
 模块状态、API 对照和后续顺序见 [docs/AI_DEVELOPMENT.md](docs/AI_DEVELOPMENT.md)。
+
+帖子正文的 UBB、Markdown 解析和安全渲染链路见 [docs/CONTENT_PARSING.md](docs/CONTENT_PARSING.md)。

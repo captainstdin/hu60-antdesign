@@ -273,9 +273,9 @@ watch(() => props.modelValue, (value) => {
 <style scoped>
 .content-editor {
   overflow: hidden;
-  border: 1px solid #d9e2e0;
+  border: 1px solid var(--line-strong);
   border-radius: 6px;
-  background: #fff;
+  background: var(--surface);
 }
 
 .editor-toolbar {
@@ -283,8 +283,8 @@ watch(() => props.modelValue, (value) => {
   align-items: center;
   min-height: 44px;
   padding: 5px 8px;
-  border-bottom: 1px solid #e6ecea;
-  background: #f8faf9;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-soft);
   gap: 8px;
 }
 
@@ -312,9 +312,9 @@ watch(() => props.modelValue, (value) => {
   display: flex;
   justify-content: space-between;
   padding: 5px 10px;
-  color: #94a09d;
+  color: var(--muted-soft);
   font-size: 11px;
-  border-top: 1px solid #edf1f0;
+  border-top: 1px solid var(--line-soft);
 }
 
 .face-grid {
@@ -332,7 +332,7 @@ watch(() => props.modelValue, (value) => {
   overflow: hidden;
   place-items: center;
   padding: 2px;
-  color: #536460;
+  color: var(--text-subtle);
   font-size: 10px;
   border: 1px solid transparent;
   border-radius: 4px;
@@ -341,8 +341,8 @@ watch(() => props.modelValue, (value) => {
 }
 
 .face-grid button:hover {
-  border-color: #a8d0ca;
-  background: #edf7f5;
+  border-color: var(--brand);
+  background: var(--brand-soft);
 }
 
 .face-grid img {

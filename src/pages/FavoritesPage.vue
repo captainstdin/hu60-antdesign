@@ -65,7 +65,7 @@ onMounted(loadFavorites)
 .page-heading {
   margin: 0;
   padding: 24px 25px 17px;
-  border-bottom: 1px solid #e5ecea;
+  border-bottom: 1px solid var(--line);
 }
 
 .page-heading h1 {
@@ -79,9 +79,9 @@ onMounted(loadFavorites)
   align-items: center;
   justify-content: center;
   padding: 16px;
-  color: #7c8b88;
+  color: var(--muted);
   font-size: 12px;
-  border-top: 1px solid #e5ecea;
+  border-top: 1px solid var(--line);
   gap: 10px;
 }
 </style>

@@ -5,7 +5,7 @@
         <a-card class="surface-card profile-hero" :bordered="false">
           <div class="profile-main">
             <UserAvatar :avatar="user._u_avatar" :uid="user.uid" :size="76" shape="square" />
-            <div>
+            <div class="profile-details">
               <h1>{{ user.name }}</h1>
               <p>UID {{ user.uid }}<span v-if="user.signature"> · {{ user.signature }}</span></p>
               <a-space wrap>
@@ -15,7 +15,7 @@
               </a-space>
             </div>
           </div>
-          <a-button @click="loadProfile"><ReloadOutlined /> 刷新资料</a-button>
+          <a-button class="profile-refresh" @click="loadProfile"><ReloadOutlined /> 刷新资料</a-button>
         </a-card>
 
         <div class="profile-grid">
@@ -178,25 +178,54 @@ onMounted(loadProfile)
   justify-content: space-between;
   padding: 28px;
   gap: 20px;
-  background: linear-gradient(130deg, #fff 50%, #eef9f6 100%);
+  background: var(--hero-gradient);
 }
 
 .profile-main {
   display: flex;
   align-items: center;
+  flex: 1 1 auto;
   min-width: 0;
+  max-width: 100%;
   gap: 18px;
+}
+
+.profile-main :deep(.ant-avatar) {
+  flex: 0 0 76px;
+  width: 76px !important;
+  height: 76px !important;
+  line-height: 76px !important;
+  overflow: hidden;
+}
+
+.profile-main :deep(.ant-avatar > img) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-details {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.profile-refresh {
+  flex: 0 0 auto;
 }
 
 .profile-main h1 {
   margin: 0;
-  color: #263e39;
+  color: var(--text-heading);
   font-size: 24px;
 }
 
 .profile-main p {
   margin: 5px 0 10px;
-  color: #71807d;
+  color: var(--muted);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .profile-grid {
@@ -216,7 +245,7 @@ onMounted(loadProfile)
 }
 
 .profile-link:hover {
-  background: #f5faf8;
+  background: var(--surface-hover);
 }
 
 .profile-link :deep(.ant-list-item-meta-avatar) {
@@ -224,20 +253,20 @@ onMounted(loadProfile)
   width: 36px;
   height: 36px;
   place-items: center;
-  color: #178f80;
+  color: var(--brand);
   font-size: 17px;
   border-radius: 10px;
-  background: #e8f5f2;
+  background: var(--brand-soft);
 }
 
 .danger-link :deep(.ant-list-item-meta-avatar),
 .danger-link :deep(.ant-list-item-meta-title) {
-  color: #d54c4c;
+  color: var(--danger);
 }
 
 .profile-link > .anticon-right {
   margin-left: 10px;
-  color: #b3bfbc;
+  color: var(--muted-soft);
   font-size: 11px;
 }
 
@@ -249,6 +278,35 @@ onMounted(loadProfile)
   .profile-hero :deep(.ant-card-body) {
     align-items: flex-start;
     flex-direction: column;
+    padding: 22px 18px;
+  }
+
+  .profile-main {
+    align-items: flex-start;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .profile-main :deep(.ant-avatar) {
+    flex: 0 0 64px;
+    width: 64px !important;
+    height: 64px !important;
+    line-height: 64px !important;
+  }
+
+  .profile-main h1 {
+    font-size: 22px;
+    line-height: 1.2;
+  }
+
+  .profile-main p {
+    margin: 4px 0 9px;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .profile-refresh {
+    align-self: flex-start;
   }
 }
 </style>
