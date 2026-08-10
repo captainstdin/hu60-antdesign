@@ -280,8 +280,8 @@ export const forumApi = {
     return accessPost(withQuery('/api.face.json', originQuery))
   },
 
-  uploadFile(file) {
-    return accessMultipart(withQuery('/bbs.upload.json', originQuery), { file }, { timeout: 120_000 })
+  uploadFile(file, options = {}) {
+    return accessMultipart(withQuery('/bbs.upload.json', originQuery), { file }, { timeout: 120_000, ...options })
   },
 
   getUser(uid) {

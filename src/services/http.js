@@ -28,6 +28,57 @@ function encodeForm(data = {}) {
   return params
 }
 
+function accessMultipartWithProgress(apiPath, body, options) {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest()
+    request.open('POST', makeUrl(apiPath))
+    request.timeout = options.timeout || REQUEST_TIMEOUT
+    request.setRequestHeader('Accept', 'application/json')
+
+    request.upload.addEventListener('progress', (event) => {
+      const percent = event.lengthComputable && event.total
+        ? Math.round((event.loaded / event.total) * 100)
+        : null
+      options.onUploadProgress({ loaded: event.loaded, total: event.total, percent })
+    })
+
+    request.addEventListener('load', () => {
+      const text = request.responseText
+      let payload
+      try {
+        payload = text ? JSON.parse(text) : {}
+      } catch (cause) {
+        reject(new ApiError('服务器返回了无法解析的数据', {
+          status: request.status,
+          data: text,
+          cause,
+        }))
+        return
+      }
+
+      if (request.status < 200 || request.status >= 300) {
+        reject(new ApiError(payload?.notice || payload?.message || `请求失败（${request.status}）`, {
+          status: request.status,
+          data: payload,
+        }))
+        return
+      }
+
+      resolve(payload)
+    })
+    request.addEventListener('error', () => {
+      reject(new ApiError('文件上传失败，请检查网络后重试'))
+    })
+    request.addEventListener('timeout', () => {
+      reject(new ApiError('文件上传超时，请稍后重试'))
+    })
+    request.addEventListener('abort', () => {
+      reject(new ApiError('文件上传已取消'))
+    })
+    request.send(body)
+  })
+}
+
 export async function accessPost(apiPath, data = {}, options = {}) {
   const controller = new AbortController()
   const timer = window.setTimeout(() => controller.abort(), options.timeout || REQUEST_TIMEOUT)
@@ -74,14 +125,19 @@ export async function accessPost(apiPath, data = {}, options = {}) {
 }
 
 export async function accessMultipart(apiPath, data = {}, options = {}) {
-  const controller = new AbortController()
-  const timer = window.setTimeout(() => controller.abort(), options.timeout || REQUEST_TIMEOUT)
   const body = new FormData()
 
   Object.entries(data).forEach(([key, value]) => {
     if (value === undefined || value === null) return
     body.append(key, value)
   })
+
+  if (typeof options.onUploadProgress === 'function') {
+    return accessMultipartWithProgress(apiPath, body, options)
+  }
+
+  const controller = new AbortController()
+  const timer = window.setTimeout(() => controller.abort(), options.timeout || REQUEST_TIMEOUT)
 
   try {
     const response = await fetch(makeUrl(apiPath), {
