@@ -6,6 +6,8 @@
 - 页面以 PC 为主，重点适配 1024、1366、1440、1920 及更宽显示器。
 - 主要产品与接口参考 `hu60_weixin_nvue`，缺失功能参考 `hu60_app`。
 - Vite `base` 固定为 `./`，路由使用 Hash 模式。构建产物可直接放入 `/dist/`、`/forum/` 等二级目录，不依赖 Nginx 的 SPA fallback。
+- Ant Design Vue 模板组件统一由 `unplugin-vue-components` 的 `AntDesignVueResolver` 自动按需引入，不在 `main.js` 全局注册组件集合。
+- `@ant-design/icons-vue` 图标必须在实际使用它的页面或组件中按名称导入，禁止整库导入或全局注册全部图标。
 - API 默认直连 `https://hu60.cn`，头像默认使用 `https://file.hu60.cn`，均可通过 `.env` 覆盖。
 - 保持原接口协议：`POST /q.php/{accessToken}/{apiPath}`，表单编码为 `application/x-www-form-urlencoded`。
 
@@ -15,6 +17,7 @@
 | --- | --- | --- | --- |
 | PC 全局框架与响应式布局 | 已完成 | `pages.json`、经典首页 | 首页采用经典论坛单列布局，功能页保留左右侧栏；窄屏自动收拢 |
 | 二级目录部署支持 | 已完成 | 部署要求 | Vite 相对资源 + Hash Router |
+| Ant Design 按需加载 | 已完成 | Vite 插件约束 | 模板组件由 resolver 自动导入；图标按页面或组件命名导入；路由页面异步加载 |
 | API 请求层与登录态 | 已完成 | `api/req.js`、`common/gateway.js` | token URL、超时、JSON 解析、localStorage |
 | 论坛首页 | 已完成 | `tarbar_index` | 话题列表、刷新、分页加载、搜索入口 |
 | 帖子搜索 | 已完成 | `page_topic_search` | 关键词/用户名、帖子/回复模式、分页、URL 查询参数同步 |
@@ -82,3 +85,8 @@
 - 新 API 统一写入 `src/services/forum.js`，页面不要自行拼接 `q.php`。
 - 静态资源不要以 `/assets/...` 这种站点根路径引用；使用 import 或 `import.meta.env.BASE_URL`。
 - 新增路由继续使用 Hash Router，不要改成 History Router，除非部署服务器已确认提供 fallback。
+- 新增路由页面继续使用 `() => import(...)` 异步加载，不要在路由入口静态导入全部页面。
+- Ant Design Vue 模板组件依赖自动按需引入；不要在 `main.js` 中恢复 `app.use(...)` 组件列表。`message`、`Modal` 等脚本 API 仍应在使用处显式导入。
+- 图标只允许从 `@ant-design/icons-vue` 按名称导入；禁止 `import * as Icons`、批量遍历注册或建立包含全部图标的公共入口。
+- 禁止为 `ant-design-vue`、`@ant-design/icons-vue`、`@ant-design/colors`、`@ctrl/tinycolor` 添加细粒度 `manualChunks`，避免跨 chunk 循环初始化；由 Vite/Rollup 自动决定这些依赖的分包。
+- 未经用户明确允许，不执行 `npm run dev`、`npm run build`、`npm run preview`，不启动服务，也不进行运行时调试。
