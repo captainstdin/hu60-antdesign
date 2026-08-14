@@ -96,7 +96,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ReloadOutlined, DownOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
@@ -262,6 +262,13 @@ onMounted(() => {
   loadTopics()
   loadForums()
 })
+
+watch(
+  () => session.isLoggedIn.value,
+  () => {
+    loadTopics(true)
+  },
+)
 </script>
 
 <style scoped>
