@@ -72,7 +72,7 @@
 | 配置读写 | `/api.webplug-data.json`，键名 `ai_config`；请求必须带 `_origin=*` 才能通过服务端跨域校验（**不能传具体域名**，服务端会过滤掉 `:` `/` 生成非法值），读取用 GET、写入用 POST + `version` 原子更新；未登录时降级到 localStorage |
 | 账号池结构 | `{ schema: 2, preferredId, accounts: [{ id, name, provider, baseUrl, model, apiKey, temperature, maxTokens }] }`；v1 的单账号对象会自动迁移成单元素池 |
 | AI 调用 | `POST {账号.baseUrl}/chat/completions`（OpenAI 兼容），`Authorization: Bearer {账号.apiKey}`，非流式；每次调用取 `preferredId` 指向的账号，缺失时回退到第一个 |
-| 平台预设 | 国内：DeepSeek、阿里百炼、腾讯混元、智谱 GLM、Kimi、硅基流动、火山方舟、百度千帆、讯飞星火、MiniMax、阶跃星辰、零一万物、魔搭；海外：OpenAI、Gemini；本地：Ollama、自定义 |
+| 平台预设 | 国内：DeepSeek、阿里百炼、腾讯混元、智谱 GLM、Kimi、硅基流动；海外：OpenAI、Gemini；本地：Ollama、自定义。只保留常用平台，其余（火山方舟、百度千帆、讯飞星火、MiniMax、阶跃星辰、魔搭、零一万物）走「自定义」手填地址与模型名 |
 
 可用功能：帖子详情页支持「总结帖子」「分析评论」「生成评论」「润色回复」「整帖翻译」「标题建议」，首页支持「帖子速览」；生成类结果支持复制、插入回复框，发表前二次确认。
 
@@ -119,6 +119,7 @@
   注意 antd 的 Select / 下拉弹层挂在 body 上、z-index 固定为 `zIndexPopupBase(1000) + 50 = 1050`（见 `select/style/index.js`），
   只要它所在的弹窗层级 ≥ 1050 就会被盖住。所以 `AiAccountForm.vue` 给平台下拉显式传了 `dropdownStyle: { zIndex: 1300 }`，新增同类下拉时要照做。
 - 平台下拉的选项由 `providerOptions()` 生成：**自定义平台单独置顶**（不放进分组），其余按国内 / 海外 / 本地部署分组。新增账号时默认选中「自定义」并展开「接口地址与模型」，因为手填地址+模型的场景最多；选预设平台则自动填好地址与模型并收起高级项。
+- 平台预设只保留常用平台（国内 6 个 + 海外 2 个 + 本地 Ollama + 自定义）。**不要为了「全」而恢复小众平台**：预设的价值是替用户填好 `baseUrl` 和模型名，凡是模型名必须手填（火山方舟的接入点 ID）或已停止服务（零一万物）的平台，放在「自定义」里没有额外收益，只会让下拉变长。新增预设前先确认该平台的模型名是固定字符串。
 - AI 结果要 Markdown 排版时统一走 `src/utils/markdown.js` 的 `renderMarkdown()`，它内部已经调用 `sanitizeHtml`，**不要**再自己拼 `v-html`。项目依然不引入 `marked` / `markdown-it`（见 `docs/CONTENT_PARSING.md`）。需要原样插入论坛回复框的结果（生成评论、润色）必须保持纯文本，不要渲染成 HTML。
 - 提示词里的排版开关集中在 `src/services/ai.js` 的 `BASE_SYSTEM`（默认允许有限的 Markdown）。凡是要把输出直接发到论坛的功能，都要在自己的 system 提示里显式覆盖为「只输出纯文本」，避免把 `###`、`**` 带进 UBB 正文。
 - Ant Design Vue 模板组件依赖自动按需引入；不要在 `main.js` 中恢复 `app.use(...)` 组件列表。`message`、`Modal` 等脚本 API 仍应在使用处显式导入。

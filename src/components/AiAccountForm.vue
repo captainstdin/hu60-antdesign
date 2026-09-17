@@ -49,7 +49,7 @@
           <a-auto-complete
             v-model:value="form.model"
             :options="modelOptions"
-            placeholder="例如 deepseek-chat"
+            placeholder="例如 deepseek-flash"
             :filter-option="filterModel"
           />
         </a-form-item>
@@ -142,7 +142,7 @@ watch(
     })
     const provider = getProvider(form.provider)
     autoFilled.value = Boolean(provider.defaultModel)
-    // 自定义平台，或者预设里没有默认模型的平台（如火山方舟），展开高级项让用户填。
+    // 自定义平台（预设里唯一没有默认模型的）展开高级项，让用户手填地址与模型。
     advancedKeys.value = (!form.provider || form.provider === CUSTOM_PROVIDER_ID || !provider.defaultModel)
       ? ['advanced']
       : []
@@ -170,7 +170,7 @@ function changeProvider(id) {
   form.baseUrl = provider.baseUrl || ''
   form.model = provider.defaultModel || ''
   autoFilled.value = Boolean(provider.baseUrl || provider.defaultModel)
-  // 有默认模型的平台收起高级项；没有的（如火山方舟）保持展开，因为模型必须手填。
+  // 有默认模型的平台收起高级项；没有的（目前只有自定义）保持展开，因为模型必须手填。
   advancedKeys.value = provider.defaultModel ? [] : ['advanced']
 }
 
