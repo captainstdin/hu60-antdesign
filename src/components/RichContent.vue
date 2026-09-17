@@ -20,16 +20,16 @@
       <UpOutlined v-if="expanded" />
       <DownOutlined v-else />
     </button>
-    <a-modal
-      v-model:open="previewOpen"
-      centered
-      destroy-on-close
-      :footer="null"
-      :width="960"
-      wrap-class-name="rich-content-preview-modal"
-    >
-      <img v-if="previewSrc" class="rich-content-preview-image" :src="previewSrc" :alt="previewAlt" />
-    </a-modal>
+    <a-image
+      v-if="previewSrc"
+      :src="previewSrc"
+      :alt="previewAlt"
+      :wrapper-style="{ display: 'none' }"
+      :preview="{
+        visible: previewOpen,
+        onVisibleChange: handlePreviewVisibleChange,
+      }"
+    />
   </div>
 </template>
 
@@ -57,6 +57,10 @@ const canCollapse = computed(() => String(props.html || '').length > 5000)
 const contentStyle = computed(() => (
   props.imageWidth ? { '--rich-content-image-width': props.imageWidth } : undefined
 ))
+
+function handlePreviewVisibleChange(visible) {
+  previewOpen.value = visible
+}
 
 function handleContentClick(event) {
   const image = event.target?.closest?.('img')
@@ -225,15 +229,4 @@ watch(() => props.html, () => {
   gap: 5px;
 }
 
-.rich-content-preview-image {
-  display: block;
-  max-width: 100%;
-  max-height: calc(90vh - 96px);
-  margin: 0 auto;
-  object-fit: contain;
-}
-
-:global(.rich-content-preview-modal .ant-modal-body) {
-  padding: 12px;
-}
 </style>

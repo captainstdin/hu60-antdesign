@@ -104,7 +104,9 @@ import PageState from '../components/PageState.vue'
 import TopicList from '../components/TopicList.vue'
 import { API_BASE_URL } from '../config/app'
 import { forumApi } from '../services/forum'
+import { aiContext } from '../stores/aiContext'
 import { session } from '../stores/session'
+import { htmlToText } from '../utils/content'
 import { hasPermission, PERMISSIONS } from '../utils/permissions'
 
 const router = useRouter()
@@ -219,6 +221,17 @@ function getErrorMessage(reason) {
   return reason?.message || '话题加载失败，请稍后重试'
 }
 
+// 把当前已加载的帖子列表交给 AI 助手，供「帖子速览」使用。
+function publishAiContext() {
+  aiContext.setHomeTopics(topics.value.slice(0, 40).map((item) => ({
+    title: item.title || item.topic?.title || '',
+    forum: item.forum_name || item.topic?.forum_name || '',
+    author: item.uinfo?.name || item._u_name || '',
+    replyCount: Number(item.reply_count ?? item.topic?.reply_count ?? 0),
+    summary: htmlToText(item.content || item.topic?.content || ''),
+  })))
+}
+
 async function loadTopics(reset = false) {
   if (reset) {
     refreshing.value = topics.value.length > 0
@@ -238,6 +251,7 @@ async function loadTopics(reset = false) {
     reviewCount.value = Number(result._myself?.countReview || 0)
     permissions.value = result._myself?.permissions || []
     applyHomeDirectories(result)
+    publishAiContext()
     if (reset && refreshing.value) message.success('已获取最新话题')
   } catch (reason) {
     error.value = getErrorMessage(reason)

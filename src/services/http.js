@@ -79,6 +79,54 @@ function accessMultipartWithProgress(apiPath, body, options) {
   })
 }
 
+async function parseJsonResponse(response) {
+  const text = await response.text()
+  let payload
+  try {
+    payload = text ? JSON.parse(text) : {}
+  } catch (cause) {
+    throw new ApiError('服务器返回了无法解析的数据', {
+      status: response.status,
+      data: text,
+      cause,
+    })
+  }
+
+  if (!response.ok) {
+    throw new ApiError(payload?.notice || payload?.message || `请求失败（${response.status}）`, {
+      status: response.status,
+      data: payload,
+    })
+  }
+
+  return payload
+}
+
+function normalizeRequestError(error) {
+  if (error instanceof ApiError) return error
+  if (error?.name === 'AbortError') return new ApiError('服务器响应超时，请稍后重试', { cause: error })
+  return new ApiError('无法连接服务器，请检查网络后重试', { cause: error })
+}
+
+export async function accessGet(apiPath, query = {}, options = {}) {
+  const controller = new AbortController()
+  const timer = window.setTimeout(() => controller.abort(), options.timeout || REQUEST_TIMEOUT)
+
+  try {
+    const response = await fetch(makeUrl(withQuery(apiPath, query), options.publicEndpoint), {
+      method: 'GET',
+      mode: 'cors',
+      headers: { Accept: 'application/json' },
+      signal: controller.signal,
+    })
+    return await parseJsonResponse(response)
+  } catch (error) {
+    throw normalizeRequestError(error)
+  } finally {
+    window.clearTimeout(timer)
+  }
+}
+
 export async function accessPost(apiPath, data = {}, options = {}) {
   const controller = new AbortController()
   const timer = window.setTimeout(() => controller.abort(), options.timeout || REQUEST_TIMEOUT)
@@ -95,30 +143,9 @@ export async function accessPost(apiPath, data = {}, options = {}) {
       signal: controller.signal,
     })
 
-    const text = await response.text()
-    let payload
-    try {
-      payload = text ? JSON.parse(text) : {}
-    } catch (cause) {
-      throw new ApiError('服务器返回了无法解析的数据', {
-        status: response.status,
-        data: text,
-        cause,
-      })
-    }
-
-    if (!response.ok) {
-      throw new ApiError(payload?.notice || payload?.message || `请求失败（${response.status}）`, {
-        status: response.status,
-        data: payload,
-      })
-    }
-
-    return payload
+    return await parseJsonResponse(response)
   } catch (error) {
-    if (error instanceof ApiError) throw error
-    if (error?.name === 'AbortError') throw new ApiError('服务器响应超时，请稍后重试', { cause: error })
-    throw new ApiError('无法连接服务器，请检查网络后重试', { cause: error })
+    throw normalizeRequestError(error)
   } finally {
     window.clearTimeout(timer)
   }

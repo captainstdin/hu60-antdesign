@@ -281,7 +281,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import {
@@ -306,7 +306,9 @@ import RichContent from '../components/RichContent.vue'
 import UserAvatar from '../components/UserAvatar.vue'
 import { forumApi } from '../services/forum'
 import { authDialog } from '../stores/authDialog'
+import { aiContext } from '../stores/aiContext'
 import { session } from '../stores/session'
+import { htmlToText } from '../utils/content'
 import { formatTime } from '../utils/date'
 import { mapForumTree } from '../utils/forums'
 import { currentPermissions, hasPermission, PERMISSIONS } from '../utils/permissions'
@@ -395,9 +397,11 @@ async function loadTopic() {
     currentPage.value = Number(result.currPage || currentPage.value)
     maxPage.value = Number(result.maxPage || currentPage.value)
     favorite.value = Boolean(result.isFavoriteTopic ?? result.tMeta?.isFavoriteTopic)
+    publishAiContext()
     nextTick(scrollToHash)
   } catch (reason) {
     error.value = reason?.message || '帖子加载失败，请稍后重试'
+    aiContext.reset('topic')
   } finally {
     loading.value = false
   }
@@ -698,11 +702,98 @@ async function handleTopicMenu({ key }) {
   }
 }
 
+/* ---------------- AI 助手上下文 ---------------- */
+
+function buildAiFloors() {
+  return contents.value.map((item, index) => {
+    const no = Number(floorNumber(item, index))
+    return {
+      no,
+      author: authorName(item),
+      text: htmlToText(item.content),
+      isOwner: isOwner(item),
+      isMain: no === 0,
+    }
+  })
+}
+
+// 主楼只会在第 1 页出现，翻页后沿用之前记住的正文与作者。
+const mainPostText = ref('')
+const mainPostAuthor = ref('')
+
+// 把已经取到的楼层内容交给 AI 助手，避免弹窗再请求一次帖子详情。
+function publishAiContext() {
+  if (!topic.value) {
+    aiContext.reset('topic')
+    return
+  }
+
+  const floors = buildAiFloors()
+  const mainFloor = floors.find((floor) => floor.isMain)
+  if (mainFloor) {
+    mainPostText.value = mainFloor.text
+    mainPostAuthor.value = mainFloor.author
+  }
+
+  aiContext.setTopic({
+    topic: {
+      id: props.id,
+      title: topicMeta.value.title || '',
+      forum: topicMeta.value.forum_name || '',
+      author: mainPostAuthor.value,
+      replyCount: replyCount.value,
+    },
+    mainPost: mainPostText.value,
+    floors,
+  })
+}
+
+// 帖子详情页把回复框的能力开放给 AI 助手：读草稿、替换草稿、直接发表。
+const replyBridge = {
+  draftRef: replyContent,
+  canSend: () => isLoggedIn.value && !isLocked.value,
+  setDraft: (text) => {
+    replyContent.value = String(text || '')
+  },
+  send: async (text) => {
+    if (!isLoggedIn.value) {
+      openLogin()
+      throw new Error('请先登录后再发表评论')
+    }
+    if (isLocked.value) throw new Error('帖子已锁定，无法回复')
+
+    const content = String(text || '').trim()
+    if (!content) throw new Error('评论内容不能为空')
+
+    replying.value = true
+    try {
+      const result = await forumApi.replyTopic(props.id, content, topic.value?.token)
+      if (result?.success === false) throw new Error(result.notice || '回复失败')
+      if (replyContent.value.trim() === content) replyContent.value = ''
+      currentPage.value = floorReverse.value ? 1 : maxPage.value
+      await loadTopic()
+    } finally {
+      replying.value = false
+    }
+  },
+}
+
+onBeforeUnmount(() => {
+  aiContext.releaseReplyBridge(replyBridge)
+  aiContext.reset('topic')
+})
+
+// 回复框一挂载就注册，用户点开 AI 助手即可直接读写草稿。
+aiContext.registerReplyBridge(replyBridge)
+
 watch(() => props.id, () => {
   topic.value = null
   contents.value = []
   currentPage.value = 1
   maxPage.value = 1
+  mainPostText.value = ''
+  mainPostAuthor.value = ''
+  aiContext.reset('topic')
   loadTopic()
 }, { immediate: true })
 </script>

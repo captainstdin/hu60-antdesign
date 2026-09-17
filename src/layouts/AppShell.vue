@@ -187,6 +187,7 @@
     </a-drawer>
 
     <LoginModal />
+    <AiAssistant />
   </a-layout>
 </template>
 
@@ -209,6 +210,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons-vue'
 
+import AiAssistant from '../components/AiAssistant.vue'
 import LoginModal from '../components/LoginModal.vue'
 import SiteFooter from '../components/SiteFooter.vue'
 import UserAvatar from '../components/UserAvatar.vue'
