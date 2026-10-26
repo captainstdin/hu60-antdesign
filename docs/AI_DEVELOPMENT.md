@@ -126,3 +126,7 @@
 - 图标只允许从 `@ant-design/icons-vue` 按名称导入；禁止 `import * as Icons`、批量遍历注册或建立包含全部图标的公共入口。
 - 禁止为 `ant-design-vue`、`@ant-design/icons-vue`、`@ant-design/colors`、`@ctrl/tinycolor` 添加细粒度 `manualChunks`，避免跨 chunk 循环初始化；由 Vite/Rollup 自动决定这些依赖的分包。
 - 未经用户明确允许，不执行 `npm run dev`、`npm run build`、`npm run preview`，不启动服务，也不进行运行时调试。
+- **路由页面的模板根必须是单个真实元素（`<div>` / `<section>` 等）**，不能是 `<PageState>` 这类组件裸根，也不能是多根模板或 `<slot>`。否则会触发下面这条已实际发生的故障。
+- 故障机理（2026-10 实际发生，`/user/xxx` 复现）：`AppShell.vue` 用 `<transition name="page-fade" mode="out-in">` 包住路由组件。`mode="out-in"` 必须等旧节点的 `afterLeave` 回调才会插入新节点；Vue 给过渡子节点挂钩子时会递归到 `vnode.component.subTree`，若 subTree 是 Fragment（多根模板，或根位置是 `<slot>`——`renderSlot()` 恒返回 Fragment），没有任何元素承接钩子，`afterLeave` 永不触发，`isLeaving` 永久为 true，之后每次渲染都直接返回空占位注释。症状：**地址栏 hash 已变、旧页面消失、新页面空白、一个请求都不发，且此后所有路由切换全部失效，直到刷新**；控制台只有一条 `[Vue warn]: Component inside <Transition> renders non-element root node that cannot be animated.`
+- `<PageState>` 的最后一个分支是 `<slot v-else />`，一旦它成为页面根就会退化成上面的 Fragment。正确写法是先套一层 `div`，参考 `ProfilePage.vue` 的 `.profile-page` 与 `UserPage.vue` 的 `.user-page`。新增"可作为页面根"的包装组件时同样要自查。
+- 不要靠在 `AppShell.vue` 里给 transition 加 keyed 包裹层来兜底：会给所有页面多插一层 DOM，并强制按 `route.path` 重新挂载，副作用大于收益。
