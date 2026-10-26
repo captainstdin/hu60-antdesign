@@ -80,7 +80,7 @@
               >
                 <div class="floor-layout">
                   <aside class="floor-user">
-                    <button type="button" class="avatar-link" @click="openUser(item.uid)">
+                    <button type="button" class="avatar-link" aria-label="查看作者资料" @click="openUser(item.uid)">
                       <UserAvatar :avatar="item._u_avatar" :uid="item.uid" :size="40" />
                     </button>
                     <div class="floor-user-copy">
@@ -277,6 +277,8 @@
         </a-form-item>
       </a-form>
     </a-modal>
+
+    <UserInfoModal ref="userModal" />
   </div>
 </template>
 
@@ -304,6 +306,7 @@ import ContentEditor from '../components/ContentEditor.vue'
 import PageState from '../components/PageState.vue'
 import RichContent from '../components/RichContent.vue'
 import UserAvatar from '../components/UserAvatar.vue'
+import UserInfoModal from '../components/UserInfoModal.vue'
 import { forumApi } from '../services/forum'
 import { authDialog } from '../stores/authDialog'
 import { aiContext } from '../stores/aiContext'
@@ -326,6 +329,7 @@ const error = ref('')
 const replyContent = ref('')
 const replying = ref(false)
 const replyCard = ref()
+const userModal = ref()
 const favorite = ref(false)
 const favoriteLoading = ref(false)
 const editOpen = ref(false)
@@ -382,8 +386,9 @@ function canEdit(item) {
   return String(item.uid) === String(session.state.user?.uid) || canModerate.value
 }
 
+// 楼层里的头像/昵称先弹窗展示资料，用户再决定是否跳转到完整的用户主页。
 function openUser(uid) {
-  if (uid) router.push({ name: 'user', params: { uid } })
+  if (uid) userModal.value?.show(uid)
 }
 
 async function loadTopic() {
