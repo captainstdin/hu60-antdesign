@@ -1,67 +1,69 @@
 <template>
-  <PageState :loading="loading" :error="error" :empty="!loading && !error && !user" @retry="loadUser">
-    <a-card v-if="user" class="surface-card user-card" :bordered="false">
-      <div class="user-cover">
-        <UserAvatar :avatar="user._u_avatar" :uid="user.uid || props.uid" :size="88" shape="square" />
-      </div>
-      <div class="user-info">
-        <a-space wrap>
-          <a-tag color="cyan">社区成员</a-tag>
-          <a-tag v-if="relationState('blockPostStat')" color="red">发言受限</a-tag>
-        </a-space>
-        <h1>{{ user.name || user._u_name || `UID ${props.uid}` }}</h1>
-        <p class="uid">UID {{ user.uid || props.uid }}</p>
+  <div class="user-page">
+    <PageState :loading="loading" :error="error" :empty="!loading && !error && !user" @retry="loadUser">
+      <a-card v-if="user" class="surface-card user-card" :bordered="false">
+        <div class="user-cover">
+          <UserAvatar :avatar="user._u_avatar" :uid="user.uid || props.uid" :size="88" shape="square" />
+        </div>
+        <div class="user-info">
+          <a-space wrap>
+            <a-tag color="cyan">社区成员</a-tag>
+            <a-tag v-if="relationState('blockPostStat')" color="red">发言受限</a-tag>
+          </a-space>
+          <h1>{{ user.name || user._u_name || `UID ${props.uid}` }}</h1>
+          <p class="uid">UID {{ user.uid || props.uid }}</p>
 
-        <a-descriptions class="user-descriptions" bordered :column="1">
-          <a-descriptions-item label="个性签名">
-            {{ user.signature || user.sign || user._u_signature || '这个人很低调，还没有留下签名。' }}
-          </a-descriptions-item>
-          <a-descriptions-item label="联系方式">
-            {{ user.contact || user._u_contact || '未公开' }}
-          </a-descriptions-item>
-          <a-descriptions-item v-if="user.regtime" label="注册时间">
-            {{ formatTime(user.regtime) }}
-          </a-descriptions-item>
-        </a-descriptions>
+          <a-descriptions class="user-descriptions" bordered :column="1">
+            <a-descriptions-item label="个性签名">
+              {{ user.signature || user.sign || user._u_signature || '这个人很低调，还没有留下签名。' }}
+            </a-descriptions-item>
+            <a-descriptions-item label="联系方式">
+              {{ user.contact || user._u_contact || '未公开' }}
+            </a-descriptions-item>
+            <a-descriptions-item v-if="user.regtime" label="注册时间">
+              {{ formatTime(user.regtime) }}
+            </a-descriptions-item>
+          </a-descriptions>
 
-        <a-space class="user-actions" wrap>
-          <a-button @click="searchUser"><SearchOutlined /> 查看 TA 的帖子</a-button>
-          <a-button @click="searchUserReplies"><CommentOutlined /> 查看 TA 的回复</a-button>
-          <a-button type="primary" @click="sendMessage"><MailOutlined /> 发送内信</a-button>
-          <template v-if="!isSelf">
-            <a-button
-              :type="relationState('isFollow') ? 'default' : 'primary'"
-              :loading="relationLoading === 'follow'"
-              @click="toggleFollow"
-            >
-              <UserDeleteOutlined v-if="relationState('isFollow')" />
-              <UserAddOutlined v-else />
-              {{ relationState('isFollow') ? '取消关注' : '关注 TA' }}
-            </a-button>
-
-            <a-dropdown placement="bottomRight">
-              <a-button :loading="Boolean(relationLoading) && relationLoading !== 'follow'">
-                更多 <DownOutlined />
+          <a-space class="user-actions" wrap>
+            <a-button @click="searchUser"><SearchOutlined /> 查看 TA 的帖子</a-button>
+            <a-button @click="searchUserReplies"><CommentOutlined /> 查看 TA 的回复</a-button>
+            <a-button type="primary" @click="sendMessage"><MailOutlined /> 发送内信</a-button>
+            <template v-if="!isSelf">
+              <a-button
+                :type="relationState('isFollow') ? 'default' : 'primary'"
+                :loading="relationLoading === 'follow'"
+                @click="toggleFollow"
+              >
+                <UserDeleteOutlined v-if="relationState('isFollow')" />
+                <UserAddOutlined v-else />
+                {{ relationState('isFollow') ? '取消关注' : '关注 TA' }}
               </a-button>
-              <template #overlay>
-                <a-menu @click="handleRelationshipMenu">
-                  <a-menu-item key="block" :danger="!relationState('isBlock')">
-                    <StopOutlined /> {{ relationState('isBlock') ? '取消屏蔽' : '屏蔽用户' }}
-                  </a-menu-item>
-                  <a-menu-item key="no_disturb">
-                    <BellOutlined /> {{ relationState('isNoDisturb') ? '取消免打扰' : '设为免打扰' }}
-                  </a-menu-item>
-                  <a-menu-item key="hideUserCSS">
-                    <EyeInvisibleOutlined /> {{ relationState('hideUserCSS') ? '显示小尾巴' : '屏蔽小尾巴' }}
-                  </a-menu-item>
-                </a-menu>
-              </template>
-            </a-dropdown>
-          </template>
-        </a-space>
-      </div>
-    </a-card>
-  </PageState>
+
+              <a-dropdown placement="bottomRight">
+                <a-button :loading="Boolean(relationLoading) && relationLoading !== 'follow'">
+                  更多 <DownOutlined />
+                </a-button>
+                <template #overlay>
+                  <a-menu @click="handleRelationshipMenu">
+                    <a-menu-item key="block" :danger="!relationState('isBlock')">
+                      <StopOutlined /> {{ relationState('isBlock') ? '取消屏蔽' : '屏蔽用户' }}
+                    </a-menu-item>
+                    <a-menu-item key="no_disturb">
+                      <BellOutlined /> {{ relationState('isNoDisturb') ? '取消免打扰' : '设为免打扰' }}
+                    </a-menu-item>
+                    <a-menu-item key="hideUserCSS">
+                      <EyeInvisibleOutlined /> {{ relationState('hideUserCSS') ? '显示小尾巴' : '屏蔽小尾巴' }}
+                    </a-menu-item>
+                  </a-menu>
+                </template>
+              </a-dropdown>
+            </template>
+          </a-space>
+        </div>
+      </a-card>
+    </PageState>
+  </div>
 </template>
 
 <script setup>
