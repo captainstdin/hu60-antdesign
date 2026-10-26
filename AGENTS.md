@@ -7,7 +7,7 @@
 
 - 未经用户明确允许，不执行 `npm run dev` / `npm run build` / `npm run preview`，不启动本地服务，不做运行时调试（含浏览器自动化抓取页面）。
 - 不构建 Go 产物；部署脚本不得引入 python 依赖（换台电脑就部署不了）。
-- 不擅自 `git commit` / `push` / `force` / `reset --hard` / 跳过 hook；提交前先核对 diff，只包含预期改动。
+- 提交可按用户指令执行；**推送一律由用户自己执行**，除非用户明确要求 Agent 推送。不做 `force` / `reset --hard` / 跳过 hook；提交前先核对 diff，只包含预期改动。
 - 不引入 `marked` / `markdown-it`；AI 结果渲染统一走 `src/utils/markdown.js` 的 `renderMarkdown()`。
 - 不整库导入 `@ant-design/icons-vue`，不在 `main.js` 恢复全量组件注册。
 - 静态资源不用站点根路径 `/assets/...`，走 import 或 `import.meta.env.BASE_URL`。
